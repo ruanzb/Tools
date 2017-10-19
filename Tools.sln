@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtractLib", "ExtractLib\Ex
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PControlsLib", "PControlsLib\PControlsLib.csproj", "{9ECA9566-11D8-4A04-AA3D-1B3AC7C82AAE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Red_Public_Json", "E:\Git_Base\wm_spider\Red_Public_Json\Red_Public_Json.csproj", "{0F99523D-44A0-47DA-B7E8-C85AC3A65296}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -49,6 +51,14 @@ Global
 		{9ECA9566-11D8-4A04-AA3D-1B3AC7C82AAE}.Release|Any CPU.Build.0 = Release|Any CPU
 		{9ECA9566-11D8-4A04-AA3D-1B3AC7C82AAE}.Release|x64.ActiveCfg = Release|Any CPU
 		{9ECA9566-11D8-4A04-AA3D-1B3AC7C82AAE}.Release|x86.ActiveCfg = Release|Any CPU
+		{0F99523D-44A0-47DA-B7E8-C85AC3A65296}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0F99523D-44A0-47DA-B7E8-C85AC3A65296}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0F99523D-44A0-47DA-B7E8-C85AC3A65296}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{0F99523D-44A0-47DA-B7E8-C85AC3A65296}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{0F99523D-44A0-47DA-B7E8-C85AC3A65296}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0F99523D-44A0-47DA-B7E8-C85AC3A65296}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0F99523D-44A0-47DA-B7E8-C85AC3A65296}.Release|x64.ActiveCfg = Release|Any CPU
+		{0F99523D-44A0-47DA-B7E8-C85AC3A65296}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
