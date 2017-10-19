@@ -1,30 +1,36 @@
-﻿using System;
-using System.Collections.Generic;
+﻿//---------------------------------------名称:封装的Http请求类 静态化
+//---------------------------------------版本:1.1.0.0
+//---------------------------------------更新时间:2017/10/19
+//---------------------------------------作者:献丑
+//---------------------------------------CSDN:http://blog.csdn.net/qq_26712977
+//---------------------------------------GitHub:https://github.com/a462247201/Tools
+
+
+
+using System;
 using System.Drawing;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 using System.Text.RegularExpressions;
 using System.IO.Compression;
 using System.Web;
 using System.Collections.Concurrent;
-using System.Threading;
-using System.IO.Ports;
-using ExtractLib;
 
 namespace HttpToolsLib
 {
+    /// <summary>
+    /// 封装的Http请求类 
+    /// </summary>
     public class HttpMethod
     {
-        #region 编解码
-    /// <summary>
-    /// URL编码
-    /// </summary>
-    /// <param name="Str">待编码字符串</param>
-    /// <param name="time">编码次数</param>
-    /// <returns></returns>
+        #region URL编解码
+        /// <summary>
+        /// URL编码
+        /// </summary>
+        /// <param name="Str">待编码字符串</param>
+        /// <param name="time">编码次数</param>
+        /// <returns></returns>
         public static String URLEncode(String Str, int time = 1)
         {
             if (String.IsNullOrEmpty(Str))
@@ -83,11 +89,33 @@ namespace HttpToolsLib
             return URLDecode(str, time);
         }
 
-
-        public static String HtmlDecode<T>(T Str,int time = 1)
+        /// <summary>
+        /// html编码 泛型
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="Str"></param>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public static String HtmlDecode<T>(T Str, int time = 1)
         {
             String str = Convert.ToString(Str);
-            for(int i = 0;i<time;i++)
+            for (int i = 0; i < time; i++)
+            {
+                str = HttpUtility.HtmlDecode(str);
+            }
+            return str;
+        }
+        /// <summary>
+        /// html解码 泛型
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="Str"></param>
+        /// <param name="time"></param>
+        /// <returns></returns>
+        public static String HtmlDecode<T>(T Str, int time = 1)
+        {
+            String str = Convert.ToString(Str);
+            for (int i = 0; i < time; i++)
             {
                 str = HttpUtility.HtmlDecode(str);
             }
@@ -98,7 +126,7 @@ namespace HttpToolsLib
         #region 文件/图片下载
 
         /// <summary>
-        /// 下载文件到指定路径
+        /// 下载文件到指定路径 原生HttpRequest
         /// </summary>
         /// <param name="DownLoadUrl">文件地址</param>
         /// <param name="SavePath">保存目录</param>
@@ -106,9 +134,11 @@ namespace HttpToolsLib
         /// <returns></returns>
         public static bool DownLoadFile(string DownLoadUrl, string SavePath, String FileName = "")
         {
+            Regex filename_reg = new Regex("(&ldquo;)|(\\r)|(\\n)|(&nbsp;)|(\\t)|\\.|\"|/");
+
             #region 配置文件路径
             //去除非法字符和空格
-            FileName = RegexMethod.RegReplace("(&ldquo;)|(\\r)|(\\n)|(&nbsp;)|(\\t)|\\.|\"|/", FileName, String.Empty);
+            FileName = filename_reg.Replace(FileName,String.Empty);
             //文件后缀名 从文件地址后缀中获取
             String filetype = Path.GetExtension(DownLoadUrl);
             //如果文件名中没有后缀名
@@ -122,6 +152,7 @@ namespace HttpToolsLib
             //形成最终保存路径 如果参数中的文件名是空的 则使用自动匹配到的文件路径  反之使用输入的文件名
             String FinalPath = String.IsNullOrEmpty(FileName) ? Path.Combine(SavePath, filename) : Path.Combine(SavePath, FileName);
             #endregion
+
             try
             {
                 #region 构造请求头
@@ -157,7 +188,7 @@ namespace HttpToolsLib
             return true;
         }
         /// <summary>
-        /// 下载图片 返回Image格式 更改携带的cookie 原生request 
+        /// 下载图片 返回Image格式 更改携带的cookie 原生request  一般用于登录时的验证码图片
         /// </summary>
         /// <param name="Url">图片地址</param>
         /// <param name="cookies">CookieContainer </param>
@@ -187,7 +218,7 @@ namespace HttpToolsLib
             return img;
         }
         /// <summary>
-        /// 下载图片
+        /// 下载图片 原生request 
         /// </summary>
         /// <param name="Url"></param>
         /// <returns></returns>
@@ -302,190 +333,6 @@ namespace HttpToolsLib
                 //Console.WriteLine(e.Message);
                 return e.Message;
             }
-            return retString;
-        }
-        /// <summary>
-        /// 封装的Http参数化请求 多次请求重定向
-        /// </summary>
-        /// <param name="Httpinfo">携带请求参数的HttpInfo参数</param>
-        /// <returns></returns>
-        public static string HttpWork_Redirect(HttpInfo Httpinfo)
-        {
-            //默认的编码为UTF-8
-            Encoding encoding = Encoding.UTF8;
-            //待返回的网页源代码
-            String retString = String.Empty;
-            try
-            {
-                var request = Httpinfo.CreatRequest();
-                request.MaximumAutomaticRedirections = 10;
-                if (request != null)
-                {
-                    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                    {
-                       // response
-                        MemoryStream _stream = new MemoryStream();
-                        //GZIIP处理
-                        if (response.ContentEncoding != null && response.ContentEncoding.Equals("gzip", StringComparison.InvariantCultureIgnoreCase))
-                        {
-                            //开始读取流并设置编码方式
-                            //new GZipStream(response.GetResponseStream(), CompressionMode.Decompress).CopyTo(_stream, 10240);
-                            //.net4.0以下写法
-                            _stream = GetMemoryStream(new GZipStream(response.GetResponseStream(), CompressionMode.Decompress));
-                        }
-                        else
-                        {
-                            //开始读取流并设置编码方式
-                            //response.GetResponseStream().CopyTo(_stream, 10240);
-                            //.net4.0以下写法
-                            _stream = GetMemoryStream(response.GetResponseStream());
-                        }
-                        //获取Byte
-                        byte[] RawResponse = _stream.ToArray();
-                        _stream.Close();
-                        if (Httpinfo.Encoding != null)
-                        {
-                            encoding = Httpinfo.Encoding;
-                        }
-                        else
-                        {
-                            //从这里开始我们要无视编码了
-                            Match meta = Regex.Match(Encoding.Default.GetString(RawResponse), "<meta([^<]*)charset=([^<]*)[\"']", RegexOptions.IgnoreCase);
-                            string charter = (meta.Groups.Count > 1) ? meta.Groups[2].Value.ToLower() : string.Empty;
-                            charter = charter.Replace("\"", "").Replace("'", "").Replace(";", "").Replace("iso-8859-1", "gbk");
-                            if (charter.Length > 2)
-                                encoding = Encoding.GetEncoding(charter.Trim());
-                            else
-                            {
-                                if (string.IsNullOrEmpty(response.CharacterSet))
-                                {
-                                    try
-                                    {
-                                        encoding = Encoding.GetEncoding(charter.Trim());
-                                    }
-                                    catch
-                                    {
-                                        encoding = Encoding.UTF8;
-                                    }
-                                }
-                                else if (response.CharacterSet.ToLower().Contains("iso-8859-1"))
-                                {
-                                    encoding = Encoding.UTF8;
-                                }
-                                else
-                                    encoding = Encoding.GetEncoding(response.CharacterSet);
-                            }
-                        }
-                        //得到返回的HTML
-                        retString = encoding.GetString(RawResponse);
-
-                    }
-                }
-
-            }
-
-            catch (System.Net.WebException e)
-            {
-                //Console.WriteLine(e.Message);
-                return e.Message;
-            }
-            return retString;
-        }
-        /// <summary>
-        /// 封装的Http参数化请求 不使用Cookie 输出状态码
-        /// </summary>
-        /// <param name="Httpinfo">携带请求参数的HttpInfo参数</param>
-        /// <returns></returns>
-        public static string HttpWork_Statue(HttpInfo Httpinfo, out HttpStatusCode code)
-        {
-            //默认的编码为UTF-8
-            Encoding encoding = Encoding.UTF8;
-            //待返回的网页源代码
-            String retString = String.Empty;
-            HttpStatusCode mycode = HttpStatusCode.NotFound;
-            try
-            {
-                var request = Httpinfo.CreatRequest();
-                if (request != null)
-                {
-                    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
-                    {
-                        mycode = response.StatusCode;
-                        MemoryStream _stream = new MemoryStream();
-                        //GZIIP处理
-                        if (response.ContentEncoding != null && response.ContentEncoding.Equals("gzip", StringComparison.InvariantCultureIgnoreCase))
-                        {
-
-                            //开始读取流并设置编码方式
-                            //new GZipStream(response.GetResponseStream(), CompressionMode.Decompress).CopyTo(_stream, 10240);
-                            //.net4.0以下写法
-                            _stream = GetMemoryStream(new GZipStream(response.GetResponseStream(), CompressionMode.Decompress));
-                        }
-                        else
-                        {
-                            //开始读取流并设置编码方式
-                            //response.GetResponseStream().CopyTo(_stream, 10240);
-                            //.net4.0以下写法
-                            _stream = GetMemoryStream(response.GetResponseStream());
-                        }
-                        //获取Byte
-                        byte[] RawResponse = _stream.ToArray();
-                        _stream.Close();
-                        if (Httpinfo.Encoding != null)
-                        {
-                            encoding = Httpinfo.Encoding;
-                        }
-                        else
-                        {
-                            //从这里开始我们要无视编码了
-                            Match meta = Regex.Match(Encoding.Default.GetString(RawResponse), "<meta([^<]*)charset=([^<]*)[\"']", RegexOptions.IgnoreCase);
-                            string charter = (meta.Groups.Count > 1) ? meta.Groups[2].Value.ToLower() : string.Empty;
-                            charter = charter.Replace("\"", "").Replace("'", "").Replace(";", "").Replace("iso-8859-1", "gbk");
-                            if (charter.Length > 2)
-                            {
-                                try
-                                {
-                                    encoding = Encoding.GetEncoding(charter.Trim());
-                                }
-                                catch
-                                {
-                                    encoding = Encoding.UTF8;
-                                }
-                            }
-                            else
-                            {
-                                if (string.IsNullOrEmpty(response.CharacterSet))
-                                {
-                                    try
-                                    {
-                                        encoding = Encoding.GetEncoding(charter.Trim());
-                                    }
-                                    catch
-                                    {
-                                        encoding = Encoding.UTF8;
-                                    }
-                                }
-                                else if (response.CharacterSet.ToLower().Contains("iso-8859-1"))
-                                {
-                                    encoding = Encoding.UTF8;
-                                }
-                                else
-                                    encoding = Encoding.GetEncoding(response.CharacterSet);
-                            }
-                        }
-                        //得到返回的HTML
-                        retString = encoding.GetString(RawResponse);
-                    }
-                }
-            }
-
-            catch (System.Net.WebException e)
-            {
-                //Console.WriteLine(e.Message);
-                code = mycode;
-                return e.Message;
-            }
-            code = mycode;
             return retString;
         }
         /// <summary>
@@ -689,7 +536,7 @@ namespace HttpToolsLib
             do
             {
                 //获取IP
-                IP = FastGetMethod(ApiUrl,null,15000,new UAPool().GetRandomUA());
+                IP = FastGetMethod(ApiUrl, null, 15000, new UAPool().GetRandomUA());
             }
             while (IP == null);
             //用正则表达式分割
@@ -723,53 +570,6 @@ namespace HttpToolsLib
 
             return html.Contains("您的IP是");
 
-        }
-        /// <summary>
-        /// 筛选有效代理ip 慎用
-        /// </summary>
-        /// <param name="ApiUrl"></param>
-        /// <returns></returns>
-        public static ConcurrentStack<String> GetUsefulIp(String ApiUrl, String CheckUrl = "https://www.baidu.com")
-        {
-            var IPS = InputApi(ApiUrl);
-            ConcurrentStack<String> retstack = new ConcurrentStack<string>();
-            String ip = String.Empty;
-            //int ActiveThread = 0;
-            //int ThreadNum = 20;
-            Parallel.ForEach(IPS, item =>
-            {
-                if (CheckIp(item, CheckUrl))
-                {
-                    //Console.WriteLine(item);
-                    retstack.Push(item);
-                }
-            });
-            //while(IPS.TryPop(out ip))
-            //{
-            //    Console.WriteLine(IPS.Count.ToString());
-            //    if(ActiveThread<ThreadNum)
-            //    {
-            //        String temp = ip;
-            //        ActiveThread++;
-            //        Task t = Task.Factory.StartNew(() => {
-            //            if (CheckIp(ip,CheckUrl))
-            //            {
-            //                Console.WriteLine(temp);
-            //                retstack.Push(temp);
-            //            }
-            //            ActiveThread--;
-            //        });
-            //    }
-            //    else
-            //    {
-            //        Thread.Sleep(1000);
-            //    }
-            //}
-            //while(ActiveThread>0)
-            //{
-            //    Thread.Sleep(1000);
-            //}
-            return retstack;
         }
 
         #endregion
@@ -805,6 +605,15 @@ namespace HttpToolsLib
             result = helper.GetHtml(item);
             return result.Html;
         }
+        /// <summary>
+        /// 返回重定向地址
+        /// </summary>
+        /// <param name="ReditUrl"></param>
+        /// <param name="Url"></param>
+        /// <param name="ip"></param>
+        /// <param name="TimeOut"></param>
+        /// <param name="UA"></param>
+        /// <returns></returns>
         public static String FastGetMethod(out String ReditUrl, String Url, String ip = null, int TimeOut = 5000, String UA = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36")
         {
             HttpHelper helper = new HttpHelper();
@@ -825,7 +634,7 @@ namespace HttpToolsLib
             if (!String.IsNullOrEmpty(ip))
             {
                 item.ProxyIp = ip;
-                 item.Timeout = 8000;
+                item.Timeout = 8000;
                 item.ReadWriteTimeout = 10000;
             }
             else
@@ -845,69 +654,8 @@ namespace HttpToolsLib
             }
             return result.Html;
         }
-        public static String FastGetMethod_Refrer(String Url, String ip = null, int TimeOut = 5000, String refrer = "")
-        {
-            HttpHelper helper = new HttpHelper();
-            HttpItem item = new HttpItem();
-            HttpResult result = new HttpResult();
-            item.Timeout = TimeOut;
-            item.UserAgent = new UAPool().GetRandomUA();
-            item.Referer = refrer;
-            item.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
-            item.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
-            item.URL = Url;
-            if (!String.IsNullOrEmpty(ip))
-            {
-                item.ProxyIp = ip;
-                // item.Timeout = 5000;
-                item.ReadWriteTimeout = 10000;
-            }
-            else
-            {
-
-                //  item.Ip = ip;
-            }
-            // info.Referer = String.Empty;
-            result = helper.GetHtml(item);
-            return result.Html;
-        }
         /// <summary>
-        /// 快速获取网页源代码
-        /// </summary>
-        /// <param name="Utl"></param>
-        public static String FastGetMethod_UTF8(String Url, String UA = "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.04", String ip = null)
-        {
-            HttpHelper helper = new HttpHelper();
-            HttpItem item = new HttpItem();
-            HttpResult result = new HttpResult();
-            item.Encoding = Encoding.UTF8;
-            if (String.IsNullOrEmpty(UA))
-            {
-                item.UserAgent = new UAPool().GetRandomUA();
-            }
-            else
-            {
-                item.UserAgent = UA;
-            }
-            item.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
-            item.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
-            item.URL = Url;
-            if (!String.IsNullOrEmpty(ip))
-            {
-                item.ProxyIp = ip;
-                item.Timeout = 5000;
-            }
-            else
-            {
-
-                //  item.Ip = ip;
-            }
-            // info.Referer = String.Empty;
-            result = helper.GetHtml(item);
-            return result.Html;
-        }
-        /// <summary>
-        /// 快速获取网页源代码
+        /// 快速Post请求
         /// </summary>
         /// <param name="Utl"></param>
         public static String FastPostMethod(String Url, String Postdata, String Refrer = null, String Cookie = null, String ip = null)
@@ -940,6 +688,14 @@ namespace HttpToolsLib
             result = helper.GetHtml(item);
             return result.Html;
         }
+        /// <summary>
+        /// 返回状态码
+        /// </summary>
+        /// <param name="Url"></param>
+        /// <param name="code"></param>
+        /// <param name="ip"></param>
+        /// <param name="allow"></param>
+        /// <returns></returns>
         public static String FastGetMethod(String Url, ref HttpStatusCode code, String ip = null, bool allow = false)
         {
             HttpHelper helper = new HttpHelper();
@@ -967,38 +723,18 @@ namespace HttpToolsLib
 
             return html;
         }
-
+        /// <summary>
+        /// 快速请求 基于HttpInfo
+        /// </summary>
+        /// <param name="Url"></param>
+        /// <returns></returns>
         public static String FastGetMethod_HttpInfo(String Url)
         {
             HttpInfo info = new HttpInfo(Url);
             return HttpMethod.HttpWork(info);
         }
-        public static String FastGetMethodA(String Url, String ip = null, bool allow = false)
-        {
-            HttpHelper helper = new HttpHelper();
-            HttpItem item = new HttpItem();
-            HttpResult result = new HttpResult();
-
-            item.URL = Url;
-            item.Allowautoredirect = allow;
-            item.UserAgent = new UAPool().GetRandomUA();
-
-            if (!String.IsNullOrEmpty(ip))
-            {
-                item.ProxyIp = ip;
-                item.Timeout = 5000;
-            }
-
-            //item.Referer = String.Empty;
-            String html = String.Empty;
-
-            result = helper.GetHtml(item);
-            html = result.Html;
-
-            return html;
-        }
         /// <summary>
-        /// 获得重定向的Url地址
+        /// 获得重定向的Url地址 基于Httpinfo
         /// </summary>
         /// <param name="tempinfo"></param>
         /// <returns></returns>

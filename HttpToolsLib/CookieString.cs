@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
@@ -164,7 +162,7 @@ namespace HttpToolsLib
             return Cookie;
         }
         /// <summary>
-        /// 判断是否为空
+        /// 判断是否为空 空返回true 否则返回false
         /// </summary>
         /// <returns></returns>
         public bool IsEmpty()

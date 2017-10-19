@@ -1,11 +1,15 @@
-﻿using ExtractLib;
+﻿//---------------------------------------名称:封装的Http请求头配置类
+//---------------------------------------更新时间:2017/10/19
+//---------------------------------------作者:献丑
+//---------------------------------------CSDN:http://blog.csdn.net/qq_26712977
+//---------------------------------------GitHub:https://github.com/a462247201/Tools
+
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
+using System.Text.RegularExpressions;
 
 
 namespace HttpToolsLib
@@ -15,6 +19,7 @@ namespace HttpToolsLib
     /// </summary>
     public class HttpInfo
     {
+
         #region 构造函数
         /// <summary>
         /// 无参构造函数 默认使用火狐浏览器UA
@@ -44,6 +49,18 @@ namespace HttpToolsLib
         #endregion
 
         #region 属性
+        /// <summary>
+        /// 用于校验请求Url的正则表达式
+        /// </summary>
+        String _UrlReg =@"((http|ftp|https)://)(([a-zA-Z0-9\._-]+\.[a-zA-Z]{2,6})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\&%_\./-~-]*)?";
+
+        public String UrlReg
+        {
+            get { return _UrlReg; }
+            set { _UrlReg = value; }
+        }
+
+
         /// <summary>
         /// 编码 默认为空 自动获取网页编码
         /// </summary>
@@ -270,7 +287,7 @@ namespace HttpToolsLib
             set { _Header = value; }
         }
         /// <summary>
-        /// 请求时是否校验请求地址 默认为true
+        /// 请求时是否使用正则表达式校验请求地址 默认为false
         /// </summary>
         bool _CheckUrl = false;
 
@@ -299,9 +316,9 @@ namespace HttpToolsLib
         /// <returns></returns>
         public HttpWebRequest CreatRequest()
         {
+            Regex url_reg = new Regex(UrlReg);
             //Url校验 正则表达式
-            String UrlReg = @"((http|ftp|https)://)(([a-zA-Z0-9\._-]+\.[a-zA-Z]{2,6})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\&%_\./-~-]*)?";
-            if (RegexMethod.CheckRegex(UrlReg, RequestUrl) || !CheckUrl)
+            if (url_reg.IsMatch(RequestUrl) || !CheckUrl)
             {
                 #region Request创建
                 WebRequest webRequest = null;
@@ -349,7 +366,7 @@ namespace HttpToolsLib
                 }
                 else if (!Cookie.IsEmpty())
                 {
-                    //使用处理过的Cookie
+                    //优先使用处理过的Cookie
                     if (String.IsNullOrEmpty(Cookie.BaseCookieStr))
                     {
                         Request.Headers[HttpRequestHeader.Cookie] = Cookie.ConventToString();

@@ -1,98 +1,88 @@
-﻿using HttpToolsLib;
+﻿//---------------------------------------名称:基于bat批处理的ADSL动态拨号帮助类
+//---------------------------------------版本:1.1.0.0
+//---------------------------------------DLL支持:ExtractLib.dll
+//---------------------------------------更新时间:2017/10/18
+//---------------------------------------作者:献丑
+//---------------------------------------CSDN:http://blog.csdn.net/qq_26712977
+//---------------------------------------GitHub:https://github.com/a462247201/Tools
+
+
+using ExtractLib;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
-using System.Linq;
 using System.Net;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace HttpToolsLib
 {
     /// <summary>
-    /// ADSL 拨号  使用bat实现
+    /// ADSL拨号帮助类 用批处理实现
     /// </summary>
     public class ADSLIP
     {
-        #region 属性和成员函数
+        #region 变量
         /// <summary>
-        /// 宽带连接名
+        ///生成的临时批处理文件名称
         /// </summary>
-        public static String ADSL_Name = String.Empty;
+        static String _temppath = "temp.bat";
+        public static String temppath
+        {
+            get { return ADSLIP._temppath; }
+            set { ADSLIP._temppath = value; }
+        }
         /// <summary>
-        /// 宽带连接用户名
-        /// </summary>
-        public static String ADSL_UserName = String.Empty;
-        /// <summary>
-        /// 宽带连接密码
-        /// </summary>
-        public static String ADSL_PassWord = String.Empty;
-        /// <summary>
-        /// 生成的临时bat路径
-        /// </summary>
-        public static String temppath = "temp.bat";
-        /// <summary>
-        /// 用于拼接bat内容的StringBulider
+        /// 字符串拼接用
         /// </summary>
         private static StringBuilder sb = new StringBuilder();
         /// <summary>
-        /// 延迟 单位为秒
+        /// 拨号等待 默认15秒
         /// </summary>
-        public static int delay = 10;
+        public static int delay = 15;
         #endregion
 
-        #region 静态方法
+        #region 常量
         /// <summary>
-        /// 切换Ip 
+        /// 公网ip查询地址
         /// </summary>
-        /// <param name="ADSL_Name">宽带连接名</param>
+        const String IPUrl = "http://2017.ip138.com/ic.asp";
+        #endregion
+
+        #region 方法
+        /// <summary>
+        /// 开始拨号
+        /// </summary>
+        /// <param name="ADSL_Name">宽带连接名称</param>
         /// <param name="ADSL_UserName">宽带连接用户名</param>
         /// <param name="ADSL_PassWord">宽带连接密码</param>
         public static void ChangeIp(String ADSL_Name = "宽带连接", String ADSL_UserName = "057476269528", String ADSL_PassWord = "147262")
         {
-            #region bat内容构造
-            //先清空
             sb.Clear();
             sb.AppendLine("@echo off");
-            //设置宽带连接相关信息
             sb.AppendLine("set adslmingzi=" + ADSL_Name);
             sb.AppendLine("set adslzhanghao=" + ADSL_UserName);
             sb.AppendLine("set adslmima=" + ADSL_PassWord);
-            //断开宽带连接
             sb.AppendLine("@Rasdial %adslmingzi% /disconnect");
             sb.AppendLine("ping 127.0.0.1 -n 2");
-            //重连
             sb.AppendLine("Rasdial %adslmingzi% %adslzhanghao% %adslmima%");
             sb.AppendLine("echo 连接中");
             sb.AppendLine("ping 127.0.0.1 -n 2");
             sb.AppendLine("ipconfig");
             // sb.AppendLine("pause");
 
-            //写入bat代码到文件
             using (StreamWriter sw = new StreamWriter(temppath, false, Encoding.Default))
             {
                 sw.Write(sb.ToString());
             }
-            #endregion
-
-            #region ADSL拨号
-            //运行bat文件
             Process.Start(temppath);
-            //延迟
             System.Threading.Thread.Sleep(delay * 1000);
-            //检查网络是否正常
             while (!HttpMethod.CheckIp(null))
             {
-                //网络不正常时延迟重播
                 Process.Start(temppath);
                 System.Threading.Thread.Sleep(2 * delay * 1000);
             }
-            //拨号完毕 删除临时bat文件
             File.Delete(temppath);
-            #endregion
         }
-
         /// <summary>
         /// 获得本地ip
         /// </summary>
@@ -111,7 +101,45 @@ namespace HttpToolsLib
             }
             return AddressIP;
         }
-        #endregion
 
+        /// <summary>
+        /// 获得公网ip
+        /// </summary>
+        /// <returns></returns>
+        public static String GetPublicIP()
+        {
+            HttpHelper helper = new HttpHelper();
+            HttpItem item = new HttpItem();
+            HttpResult result = new HttpResult();
+            String reg = "\\[(.+?)\\]";
+            item.URL = IPUrl;
+            item.Timeout = 5000;
+            item.ReadWriteTimeout = 10000;
+            //item.UserAgent = UAPool.GetRandomUA();
+            item.UserAgent = "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.04";
+
+            String html = helper.GetHtml(item).Html;
+
+            return RegexMethod.GetSingleResult(reg, html, 1);
+        }
+
+        public static bool CheckIp(String Ip, String CheckUrl = "http://2017.ip138.com/ic.asp")
+        {
+            HttpHelper helper = new HttpHelper();
+            HttpItem item = new HttpItem();
+            HttpResult result = new HttpResult();
+            item.URL = CheckUrl;
+            item.ProxyIp = Ip;
+            item.Timeout = 5000;
+            item.ReadWriteTimeout = 10000;
+            //item.UserAgent = UAPool.GetRandomUA();
+            item.UserAgent = "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.04";
+
+            String html = helper.GetHtml(item).Html;
+
+            return html.Contains("您的IP是");
+
+        }
+        #endregion
     }
 }

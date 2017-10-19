@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 2013
 VisualStudioVersion = 12.0.21005.1
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tools", "Tools\Tools.csproj", "{D1C6FDFF-ABFB-4D8A-AE05-2D3DAB6C08EE}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpToolsLib", "HttpToolsLib\HttpToolsLib.csproj", "{B2D258F5-F9F6-4F39-A5A3-5B66CDF04B8B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExtractLib", "ExtractLib\ExtractLib.csproj", "{393C4598-0B4D-45A7-A017-FA945DBB8335}"
@@ -19,14 +17,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D1C6FDFF-ABFB-4D8A-AE05-2D3DAB6C08EE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D1C6FDFF-ABFB-4D8A-AE05-2D3DAB6C08EE}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D1C6FDFF-ABFB-4D8A-AE05-2D3DAB6C08EE}.Debug|x64.ActiveCfg = Debug|Any CPU
-		{D1C6FDFF-ABFB-4D8A-AE05-2D3DAB6C08EE}.Debug|x86.ActiveCfg = Debug|Any CPU
-		{D1C6FDFF-ABFB-4D8A-AE05-2D3DAB6C08EE}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D1C6FDFF-ABFB-4D8A-AE05-2D3DAB6C08EE}.Release|Any CPU.Build.0 = Release|Any CPU
-		{D1C6FDFF-ABFB-4D8A-AE05-2D3DAB6C08EE}.Release|x64.ActiveCfg = Release|Any CPU
-		{D1C6FDFF-ABFB-4D8A-AE05-2D3DAB6C08EE}.Release|x86.ActiveCfg = Release|Any CPU
 		{B2D258F5-F9F6-4F39-A5A3-5B66CDF04B8B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{B2D258F5-F9F6-4F39-A5A3-5B66CDF04B8B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2D258F5-F9F6-4F39-A5A3-5B66CDF04B8B}.Debug|x64.ActiveCfg = Debug|x64
