@@ -1,7 +1,17 @@
-﻿using System;
+﻿#region 说明
+//---------------------------------------名称:封装的正则表达式处理类
+//---------------------------------------版本:1.1.0.0
+//---------------------------------------更新时间:2017/10/18
+//---------------------------------------作者:献丑
+//---------------------------------------CSDN:http://blog.csdn.net/qq_26712977
+//---------------------------------------GitHub:https://github.com/a462247201/Tools
+#endregion
+
+#region 名空间
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
-
+#endregion
 
 namespace ExtractLib
 {
@@ -10,7 +20,8 @@ namespace ExtractLib
     /// </summary>
     public class RegexMethod
     {
-        /// <summary>
+        #region 方法
+		// <summary>
         /// 抽取单条
         /// </summary>
         /// <param name="Regstr">正则表达式字符串</param>
@@ -162,7 +173,12 @@ namespace ExtractLib
             Regex reg = new Regex(Regstr);
             return reg.Split(Txt);
         }
-
+        /// <summary>
+        /// 获得文本中第一条匹配的数字文本
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="p"></param>
+        /// <returns></returns>
         public static String GetNum<T>(T p)
         {
             String str = RegexMethod.GetSingleResult("[0-9]+",Convert.ToString(p));
@@ -171,6 +187,7 @@ namespace ExtractLib
                 return "0";
             }
             return str;
-        }
+        } 
+	#endregion
     }
 }

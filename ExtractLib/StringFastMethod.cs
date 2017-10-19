@@ -1,14 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿//---------------------------------------名称:封装的字符串处理操作类
+//---------------------------------------版本:1.1.0.0
+//---------------------------------------更新时间:2017/10/18
+//---------------------------------------作者:献丑
+//---------------------------------------CSDN:http://blog.csdn.net/qq_26712977
+//---------------------------------------GitHub:https://github.com/a462247201/Tools
+
+#region 名空间
+using System;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Text.RegularExpressions; 
+#endregion
 
 namespace ExtractLib
 {
+    /// <summary>
+    /// 字符串快捷处理
+    /// </summary>
     public class StringFastMethod
     {
-
+        #region 字符串截取
         /// <summary>
         /// 取字符串中间 切割用
         /// </summary>
@@ -49,7 +59,9 @@ namespace ExtractLib
             return strmid;
             //返回中间字符串
         }
+        #endregion
 
+        #region 转换
         /// <summary>
         /// <summary>
         /// 字符串转Unicode
@@ -87,5 +99,24 @@ namespace ExtractLib
             return new Regex(@"\\u([0-9A-F]{4})", RegexOptions.IgnoreCase | RegexOptions.Compiled).Replace(
                          Convert.ToString(source), x => string.Empty + Convert.ToChar(Convert.ToUInt16(x.Result("$1"), 16)));
         }
+        /// <summary>
+        /// 字符串编码转换
+        /// </summary>
+        /// <param name="str">待转换字符串</param>
+        /// <param name="from">初始编码</param>
+        /// <param name="to">目标编码</param>
+        /// <returns></returns>
+        public static string Get_EncodingStr(string str, String from, String to)
+        {
+            Encoding From, To;
+            From = Encoding.GetEncoding(from);
+            To = Encoding.GetEncoding(to);
+            byte[] temp = From.GetBytes(str);
+            byte[] temp1 = Encoding.Convert(From, To, temp);
+            //返回转换后的字符  
+            return To.GetString(temp1);
+        }
+        #endregion
+ 
     }
 }
