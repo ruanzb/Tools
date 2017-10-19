@@ -1,12 +1,13 @@
-﻿//---------------------------------------名称:封装的Http请求类 静态化
+﻿#region 说明
+//---------------------------------------名称:封装的Http请求类 静态化
 //---------------------------------------版本:1.1.0.0
 //---------------------------------------更新时间:2017/10/19
 //---------------------------------------作者:献丑
 //---------------------------------------CSDN:http://blog.csdn.net/qq_26712977
-//---------------------------------------GitHub:https://github.com/a462247201/Tools
+//---------------------------------------GitHub:https://github.com/a462247201/Tools 
+#endregion
 
-
-
+#region 名空间
 using System;
 using System.Drawing;
 using System.IO;
@@ -15,7 +16,8 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO.Compression;
 using System.Web;
-using System.Collections.Concurrent;
+using System.Collections.Concurrent; 
+#endregion
 
 namespace HttpToolsLib
 {
@@ -112,12 +114,12 @@ namespace HttpToolsLib
         /// <param name="Str"></param>
         /// <param name="time"></param>
         /// <returns></returns>
-        public static String HtmlDecode<T>(T Str, int time = 1)
+        public static String HtmlEecode<T>(T Str, int time = 1)
         {
             String str = Convert.ToString(Str);
             for (int i = 0; i < time; i++)
             {
-                str = HttpUtility.HtmlDecode(str);
+                str = HttpUtility.HtmlEncode(str);
             }
             return str;
         }

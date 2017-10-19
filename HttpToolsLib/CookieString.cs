@@ -1,7 +1,19 @@
-﻿using System;
+﻿#region 说明
+//---------------------------------------名称:以字符串形式处理Cookie
+//---------------------------------------版本:1.1.0.0
+//---------------------------------------更新时间:2017/10/18
+//---------------------------------------作者:献丑
+//---------------------------------------CSDN:http://blog.csdn.net/qq_26712977
+//---------------------------------------GitHub:https://github.com/a462247201/Tools
+#endregion
+
+#region 名空间
+using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+#endregion
+
 
 namespace HttpToolsLib
 {

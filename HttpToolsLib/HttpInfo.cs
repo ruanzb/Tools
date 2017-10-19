@@ -1,15 +1,19 @@
-﻿//---------------------------------------名称:封装的Http请求头配置类
+﻿#region 说明
+//---------------------------------------名称:封装的Http请求头配置类
 //---------------------------------------更新时间:2017/10/19
 //---------------------------------------作者:献丑
 //---------------------------------------CSDN:http://blog.csdn.net/qq_26712977
-//---------------------------------------GitHub:https://github.com/a462247201/Tools
+//---------------------------------------GitHub:https://github.com/a462247201/Tools 
+#endregion
 
+#region 名空间
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
 using System.Text;
-using System.Text.RegularExpressions;
+using System.Text.RegularExpressions; 
+#endregion
 
 
 namespace HttpToolsLib
@@ -406,7 +410,7 @@ namespace HttpToolsLib
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine("设置代理ip失败");
+                        Console.WriteLine("设置代理ip失败:{0}",ex.Message);
                     }
                 }
                 #endregion

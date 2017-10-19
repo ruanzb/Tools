@@ -1,18 +1,20 @@
-﻿//---------------------------------------名称:基于bat批处理的ADSL动态拨号帮助类
+﻿#region 说明
+//---------------------------------------名称:基于bat批处理的ADSL动态拨号帮助类
 //---------------------------------------版本:1.1.0.0
-//---------------------------------------DLL支持:ExtractLib.dll
 //---------------------------------------更新时间:2017/10/18
 //---------------------------------------作者:献丑
 //---------------------------------------CSDN:http://blog.csdn.net/qq_26712977
 //---------------------------------------GitHub:https://github.com/a462247201/Tools
+#endregion
 
-
-using ExtractLib;
+#region 名空间
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Text;
+using System.Text.RegularExpressions;
+#endregion
 
 namespace HttpToolsLib
 {
@@ -111,7 +113,7 @@ namespace HttpToolsLib
             HttpHelper helper = new HttpHelper();
             HttpItem item = new HttpItem();
             HttpResult result = new HttpResult();
-            String reg = "\\[(.+?)\\]";
+            Regex reg = new Regex("\\[(.+?)\\]");
             item.URL = IPUrl;
             item.Timeout = 5000;
             item.ReadWriteTimeout = 10000;
@@ -119,8 +121,16 @@ namespace HttpToolsLib
             item.UserAgent = "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.04";
 
             String html = helper.GetHtml(item).Html;
+            String ip = String.Empty;
+            try
+            {
+                 ip = reg.Match(html).Groups[1].Value;
+            }
+            catch
+            {
 
-            return RegexMethod.GetSingleResult(reg, html, 1);
+            }
+            return ip;
         }
 
         public static bool CheckIp(String Ip, String CheckUrl = "http://2017.ip138.com/ic.asp")

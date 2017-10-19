@@ -1,15 +1,18 @@
-﻿//---------------------------------------名称:UA池
+﻿#region 说明
+//---------------------------------------名称:UA池
 //---------------------------------------版本:1.1.0.0
 //---------------------------------------DLL支持:ExtractLib.dll
 //---------------------------------------更新时间:2017/10/18
 //---------------------------------------作者:献丑
 //---------------------------------------CSDN:http://blog.csdn.net/qq_26712977
-//---------------------------------------GitHub:https://github.com/a462247201/Tools
+//---------------------------------------GitHub:https://github.com/a462247201/Tools 
+#endregion
 
-
+#region 名空间
 using System;
 using System.Collections.Concurrent;
-using System.Linq;
+using System.Linq; 
+#endregion
 
 namespace HttpToolsLib
 {
