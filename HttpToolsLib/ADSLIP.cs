@@ -150,6 +150,43 @@ namespace HttpToolsLib
             return html.Contains("您的IP是");
 
         }
+        /// <summary>
+        /// 判断是否为正确的IP地址，IP范围（0.0.0.0～255.255.255）
+        /// </summary>
+        /// <param name="ip">需验证的IP地址</param>
+        /// <returns></returns>
+        public bool IsIP(String ip)
+        {
+            return System.Text.RegularExpressions.Regex.Match(ip, @"^(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])$").Success;
+        }
+
+        /// <summary>
+        /// 比较两个IP地址的大小
+        /// </summary>
+        /// <param name="ipx">要比较的第一个对象</param>
+        /// <param name="ipy">要比较的第二个对象</param>
+        /// <returns>比较的结果.如果相等返回0，如果x大于y返回1，如果x小于y返回-1</returns>
+        private int CompareIp(string ipx, string ipy)
+        {
+            string[] ipxs = ipx.Split('.');
+            string[] ipys = ipy.Split('.');
+            for (int i = 0; i < 4; i++)
+            {
+                if (Convert.ToInt32(ipxs[i]) > Convert.ToInt32(ipys[i]))
+                {
+                    return 1;
+                }
+                else if (Convert.ToInt32(ipxs[i]) < Convert.ToInt32(ipys[i]))
+                {
+                    return -1;
+                }
+                else
+                {
+                    continue;
+                }
+            }
+            return 0;
+        }
         #endregion
     }
 }
