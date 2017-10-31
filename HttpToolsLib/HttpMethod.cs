@@ -267,7 +267,6 @@ namespace HttpToolsLib
                 var request = Httpinfo.CreatRequest();
                 if (request != null)
                 {
-                    request.MaximumAutomaticRedirections = 50;
                     using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
                     {
                         MemoryStream _stream = new MemoryStream();

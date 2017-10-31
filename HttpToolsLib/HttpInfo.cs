@@ -1,6 +1,6 @@
 ﻿#region 说明
 //---------------------------------------名称:封装的Http请求头配置类
-//---------------------------------------更新时间:2017/10/19
+//---------------------------------------更新时间:2017/10/31
 //---------------------------------------作者:献丑
 //---------------------------------------CSDN:http://blog.csdn.net/qq_26712977
 //---------------------------------------GitHub:https://github.com/a462247201/Tools 
@@ -362,7 +362,7 @@ namespace HttpToolsLib
                 //设置KeepAlive
                 Request.KeepAlive = KeepLive;
                 //设置HttpVersion
-                Request.ProtocolVersion = HttpVersion.Version10;
+                Request.ProtocolVersion = ProtocolVersion;
                 //优先使用CC
                 if (CC != null && CC.Count != 0)
                 {
