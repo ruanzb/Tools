@@ -1,7 +1,7 @@
 ﻿#region 说明
 //---------------------------------------名称:封装的正则表达式处理类
-//---------------------------------------版本:1.1.0.0
-//---------------------------------------更新时间:2017/10/18
+//---------------------------------------版本:1.2.0.0
+//---------------------------------------更新时间:2017/11/03
 //---------------------------------------作者:献丑
 //---------------------------------------CSDN:http://blog.csdn.net/qq_26712977
 //---------------------------------------GitHub:https://github.com/a462247201/Tools
@@ -27,7 +27,7 @@ namespace ExtractLib
         /// <param name="Regstr">正则表达式字符串</param>
         /// <param name="Txt">待匹配的文本</param>
         /// <returns></returns>
-        public static String GetSingleResult(String Regstr, String Txt)
+        public static String GetSingleResult(String Regstr, String Txt, bool MatchCheck = false)
         {
             String retStr = String.Empty;
             if (String.IsNullOrEmpty(Txt))
@@ -37,10 +37,20 @@ namespace ExtractLib
             if (!String.IsNullOrEmpty(Regstr))
             {
                 Regex reg = new Regex(Regstr);
-                if (reg.IsMatch(Txt))
+                if (MatchCheck)
                 {
-                    retStr = reg.Match(Txt).Value;
+                    if (reg.IsMatch(Txt))
+                    {
+                        return String.Empty;
+                    }
                 }
+                var match = reg.Match(Txt);
+                if (match == null)
+                {
+                    return String.Empty;
+                }
+                return reg.Match(Txt).Value;
+        
             }
             return retStr;
         }
@@ -50,8 +60,9 @@ namespace ExtractLib
         /// <param name="Regstr">正则表达式字符串</param>
         /// <param name="Txt">待匹配的文本</param>
         /// <param name="Layer">抽取层数</param>
+        /// <param name="MatchCheck">是否检查匹配</param>
         /// <returns></returns>
-        public static String GetSingleResult(String Regstr, String Txt, int Layer)
+        public static String GetSingleResult(String Regstr, String Txt, int Layer,bool MatchCheck = false)
         {
             String retStr = String.Empty;
             if(String.IsNullOrEmpty(Txt))
@@ -61,14 +72,19 @@ namespace ExtractLib
             if (!String.IsNullOrEmpty(Regstr))
             {
                 Regex reg = new Regex(Regstr);
-                if (reg.IsMatch(Txt))
+                if(MatchCheck)
                 {
-                    retStr = reg.Match(Txt).Groups[Layer].Value;
-                    if(!String.IsNullOrEmpty(retStr))
+                    if (reg.IsMatch(Txt))
                     {
-                        retStr = retStr.Trim();
+                        return String.Empty;
                     }
                 }
+                retStr = reg.Match(Txt).Groups[Layer].Value;
+                if (!String.IsNullOrEmpty(retStr))
+                {
+                    retStr = retStr.Trim();
+                }
+            
             }
             return retStr;
         }
@@ -77,8 +93,10 @@ namespace ExtractLib
         /// </summary>
         /// <param name="Regstr">正则表达式字符串</param>
         /// <param name="Txt">待匹配的文本</param>
+        /// <param name="regop">是否匹配大小写</param>
+        /// <param name="MatchCheck">是否检查匹配</param>
         /// <returns></returns>
-        public static List<String> GetMutResult(String Regstr, String Txt,RegexOptions regop = RegexOptions.None)
+        public static List<String> GetMutResult(String Regstr, String Txt, RegexOptions regop = RegexOptions.None, bool MatchCheck = false)
         {
             if(String.IsNullOrEmpty(Txt))
             {
@@ -88,9 +106,16 @@ namespace ExtractLib
             if (!String.IsNullOrEmpty(Regstr))
             {
                 Regex reg = new Regex(Regstr,regop);
-                if (reg.IsMatch(Txt))
+                if(MatchCheck)
                 {
-                    MatchCollection mc = reg.Matches(Txt);
+                    if (reg.IsMatch(Txt))
+                    {
+                        return RetList;
+                    }
+                }
+                MatchCollection mc = reg.Matches(Txt);
+                if(mc!=null)
+                {
                     foreach (Match m in mc)
                     {
                         RetList.Add(m.Value);
@@ -105,8 +130,9 @@ namespace ExtractLib
         /// <param name="Regstr">正则表达式字符串</param>
         /// <param name="Txt">待匹配的文本</param>
         /// <param name="Layer">抽取层数</param>
+        /// <param name="MatchCheck">是否检查匹配</param>
         /// <returns></returns>
-        public static List<String> GetMutResult(String Regstr, String Txt, int Layer)
+        public static List<String> GetMutResult(String Regstr, String Txt, int Layer,bool MatchCheck = false)
         {
             if(String.IsNullOrEmpty(Txt))
             {
@@ -116,9 +142,16 @@ namespace ExtractLib
             if (!String.IsNullOrEmpty(Regstr))
             {
                 Regex reg = new Regex(Regstr);
-                if (reg.IsMatch(Txt))
+                if (MatchCheck)
                 {
-                    MatchCollection mc = reg.Matches(Txt);
+                    if (reg.IsMatch(Txt))
+                    {
+                        return RetList;
+                    }
+                }
+                MatchCollection mc = reg.Matches(Txt);
+                if (mc != null)
+                {
                     foreach (Match m in mc)
                     {
                         RetList.Add(m.Groups[Layer].Value);
@@ -184,7 +217,7 @@ namespace ExtractLib
             String str = RegexMethod.GetSingleResult("[0-9]+",Convert.ToString(p));
             if(String.IsNullOrEmpty(str))
             {
-                return "0";
+                return String.Empty;
             }
             return str;
         } 
