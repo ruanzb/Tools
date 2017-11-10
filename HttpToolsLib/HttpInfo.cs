@@ -23,7 +23,6 @@ namespace HttpToolsLib
     /// </summary>
     public class HttpInfo
     {
-
         #region 构造函数
         /// <summary>
         /// 无参构造函数 默认使用火狐浏览器UA

@@ -1,7 +1,7 @@
 ﻿#region 说明
 //---------------------------------------名称:封装的Http请求类 静态化
-//---------------------------------------版本:1.1.0.0
-//---------------------------------------更新时间:2017/10/31
+//---------------------------------------版本:1.1.2.0
+//---------------------------------------更新时间:2017/11/03
 //---------------------------------------作者:献丑
 //---------------------------------------CSDN:http://blog.csdn.net/qq_26712977
 //---------------------------------------GitHub:https://github.com/a462247201/Tools 
@@ -16,7 +16,7 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.IO.Compression;
 using System.Web;
-using System.Collections.Concurrent; 
+using System.Collections.Concurrent;
 #endregion
 
 namespace HttpToolsLib
@@ -126,6 +126,117 @@ namespace HttpToolsLib
         #endregion
 
         #region 文件/图片下载
+        /// <summary>
+        /// HttpInfo
+        /// </summary>
+        /// <param name="DownLoadUrl"></param>
+        /// <param name="SavePath">文件夹路径</param>
+        /// <param name="FileName"></param>
+        /// <returns></returns>
+        public static bool DownLoadFile(HttpInfo info, string FloderPath, String FileName = "")
+        {
+           Regex filename_reg = new Regex("(&ldquo;)|(\\r)|(\\n)|(&nbsp;)|(\\t)|\\.|\"|/");
+
+            #region 配置文件路径
+            //去除非法字符和空格
+            FileName = filename_reg.Replace(FileName, String.Empty);
+            //文件后缀名 从文件地址后缀中获取
+            String filetype = Path.GetExtension(info.RequestUrl);
+            //如果文件名中没有后缀名
+            if (!String.IsNullOrEmpty(Path.GetExtension(FileName)))
+            {
+                //拼接后缀名
+                FileName = FileName + filetype;
+            }
+            //获得下载地址中匹配到文件名
+            String filename = Path.GetFileName(info.RequestUrl);
+            //形成最终保存路径 如果参数中的文件名是空的 则使用自动匹配到的文件路径  反之使用输入的文件名
+            String FinalPath =  Path.Combine(FloderPath, filename);
+            #endregion
+
+            try
+            {
+                var Myrq = info.CreatRequest();
+                if(Myrq!= null)
+                {
+                    using (System.Net.HttpWebResponse myrp = (System.Net.HttpWebResponse)Myrq.GetResponse())
+                    {
+                        #region 下载
+                        long totalBytes = myrp.ContentLength;
+                        object[] args = { (int)totalBytes, 0 };
+
+                        System.IO.Stream st = myrp.GetResponseStream();
+                        System.IO.Stream so = new System.IO.FileStream(FinalPath, System.IO.FileMode.Create);
+                        long totalDownloadedByte = 0;
+                        byte[] by = new byte[1024];
+                        int osize = st.Read(by, 0, (int)by.Length);
+                        while (osize > 0)
+                        {
+                            int taskosiz = osize;
+                            totalDownloadedByte = osize + totalDownloadedByte;
+                            so.Write(by, 0, osize);
+                            osize = st.Read(by, 0, (int)by.Length);
+                        }
+                        so.Close();
+                        st.Close();
+                        #endregion
+                    }
+                }
+            }
+            catch (System.Exception)
+            {
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// HttpInfo
+        /// </summary>
+        /// <param name="DownLoadUrl"></param>
+        /// <param name="SavePath">绝对路径</param>
+        /// <returns></returns>
+        public static bool DownLoadFile_ABPath(HttpInfo info, string SavePath)
+        {
+            #region 配置文件路径
+            String FinalPath = SavePath;
+            #endregion
+
+            try
+            {
+                var Myrq = info.CreatRequest();
+                if (Myrq != null)
+                {
+                    using (System.Net.HttpWebResponse myrp = (System.Net.HttpWebResponse)Myrq.GetResponse())
+                    {
+                        #region 下载
+                        long totalBytes = myrp.ContentLength;
+                        object[] args = { (int)totalBytes, 0 };
+
+                        System.IO.Stream st = myrp.GetResponseStream();
+                        System.IO.Stream so = new System.IO.FileStream(FinalPath, System.IO.FileMode.Create);
+                        long totalDownloadedByte = 0;
+                        byte[] by = new byte[1024];
+                        int osize = st.Read(by, 0, (int)by.Length);
+                        while (osize > 0)
+                        {
+                            int taskosiz = osize;
+                            totalDownloadedByte = osize + totalDownloadedByte;
+                            so.Write(by, 0, osize);
+                            osize = st.Read(by, 0, (int)by.Length);
+                        }
+                        so.Close();
+                        st.Close();
+                        #endregion
+                    }
+                }
+            }
+            catch (System.Exception)
+            {
+                return false;
+            }
+            return true;
+        }
 
         /// <summary>
         /// 下载文件到指定路径 原生HttpRequest
@@ -140,7 +251,7 @@ namespace HttpToolsLib
 
             #region 配置文件路径
             //去除非法字符和空格
-            FileName = filename_reg.Replace(FileName,String.Empty);
+            FileName = filename_reg.Replace(FileName, String.Empty);
             //文件后缀名 从文件地址后缀中获取
             String filetype = Path.GetExtension(DownLoadUrl);
             //如果文件名中没有后缀名
@@ -245,6 +356,34 @@ namespace HttpToolsLib
             {
                 Console.WriteLine(ex.Message);
             }
+            return img;
+        }
+        /// <summary>
+        /// 下载图片 使用HttpInfo
+        /// </summary>
+        /// <param name="info"></param>
+        /// <returns></returns>
+        public static Image DownPic(HttpInfo info)
+        {
+            Image img = null;
+            try
+            {
+                var request = info.CreatRequest();
+                if (request != null)
+                {
+                    using (HttpWebResponse response = (HttpWebResponse)request.GetResponse())
+                    {
+                        Stream myResponseStream = response.GetResponseStream();
+                        var bytes = GetMemoryStream(myResponseStream).ToArray();
+                        img = ByteToImage(bytes);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
             return img;
         }
 
@@ -435,8 +574,11 @@ namespace HttpToolsLib
             }
             finally
             {
-                request.Abort();
-                request = null;
+                if(request!=null)
+                {
+                    request.Abort();
+                    request = null;
+                }
             }
             return retString;
         }
