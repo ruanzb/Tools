@@ -147,9 +147,10 @@ namespace ExcelHelperLib
         /// <summary>
         /// 使用指定的Excel模板创建Excel文件
         /// </summary>
-        /// <param name="FormatType"></param>
+        /// <param name="FormatType">模板</param>
+        /// <param name="Save">是否直接保存</param>
         /// <returns></returns>
-        public static Workbook CreateExcel(ExcelFormat FormatType)
+        public static Workbook CreateExcel(ExcelFormat FormatType,bool Save = true)
         {
             //实例化workbook对象
             Workbook workbook = new Workbook();
@@ -166,9 +167,9 @@ namespace ExcelHelperLib
                     //设置列宽
                     cells.SetColumnWidth(i, FormatType.ColumnsSize);
                     //单元格赋值
-                    cells[0, i].PutValue(FormatType.Columns[i].Txt_Obj);
+                    cells[0, FormatType.Columns[i].Y].PutValue(FormatType.Columns[i].Txt_Obj);
                     //设置样式
-                    cells[0,i].SetStyle(FormatType.Columns[i].CreateStyle());
+                    cells[0, FormatType.Columns[i].Y].SetStyle(FormatType.Columns[i].CreateStyle());
                 }
             }
             //有列标题
@@ -179,13 +180,37 @@ namespace ExcelHelperLib
                     //设置行高
                     cells.SetColumnWidth(i, FormatType.RowsSize);
                     //单元格赋值
-                    cells[i, 0].PutValue(FormatType.Rows[i]);
+                    cells[FormatType.Rows[i].X, 0].PutValue(FormatType.Rows[i].Txt_Obj);
                     //设置样式
-                    cells[i, 0].SetStyle(FormatType.Rows[i].CreateStyle());
+                    cells[FormatType.Rows[i].X, 0].SetStyle(FormatType.Rows[i].CreateStyle());
                     //cells[i, 0].SetStyle(FormatType.Rows[i].CreateStyle());
                 }
             }
 
+            if(FormatType.SCells.Count>0)
+            {
+                foreach(var cell in FormatType.SCells)
+                {
+                    //单元格赋值
+                    cells[cell.X, cell.Y].PutValue(cell.Txt_Obj);
+                    //设置样式
+                    cells[cell.X, cell.Y].SetStyle(cell.CreateStyle());
+                }
+            }
+
+            if(Save)
+            {
+                try
+                {
+                    workbook.Save(FormatType.SavePath);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("保存失败");
+                    throw ex;
+                }
+            }
+  
             return workbook;
         }
         #endregion
