@@ -49,12 +49,18 @@ namespace ExcelHelperLib
                 style.Pattern = BackgroundType.Solid;
             }
 
+            //对齐
+            style.HorizontalAlignment = CStyle.HorizontalAlignment;
+            style.VerticalAlignment = CStyle.VerticalAlignment;
 
             //字体
             style.Font.IsBold = CStyle.IsBold;
             style.Font.IsItalic = CStyle.IsItalic;
-            style.Font.Size = CStyle.Size;
+            style.Font.Size = CStyle.FontSize;
             style.Font.Color = CStyle.FontColor;
+
+            //换行
+            style.IsTextWrapped = CStyle.IsTextWrapped;
             return style;
         }
         #endregion

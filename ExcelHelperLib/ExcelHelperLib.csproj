@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CellBase.cs" />
+    <Compile Include="CellRow.cs" />
     <Compile Include="CellStyle.cs" />
     <Compile Include="ExcelFormat.cs" />
     <Compile Include="ExcelMethod.cs" />

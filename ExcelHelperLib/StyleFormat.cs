@@ -15,7 +15,7 @@ using Aspose.Cells;
 namespace ExcelHelperLib
 {
     /// <summary>
-    /// 全局样式模板
+    /// 区域样式模板 指定区域内所有单元格的样式
     /// </summary>
    public  class StyleFormat
     {
@@ -40,27 +40,7 @@ namespace ExcelHelperLib
             set { _RowsSize = value; }
         }
 
-        /// <summary>
-        /// 文字对齐方式 默认居中
-        /// </summary>
-        TextAlignmentType _Alignment = TextAlignmentType.Center;
-
-        public TextAlignmentType Alignment
-        {
-            get { return _Alignment; }
-            set { _Alignment = value; }
-        }
-
-        /// <summary>
-        /// 是否自动换行
-        /// </summary>
-        bool _IsTextWrapped = false;
-
-        public bool IsTextWrapped
-        {
-            get { return _IsTextWrapped; }
-            set { _IsTextWrapped = value; }
-        }
+   
 
     }
 }

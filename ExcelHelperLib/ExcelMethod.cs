@@ -25,9 +25,9 @@ namespace ExcelHelperLib
         /// <summary>
         /// 对位于1,1的单元格的填充方式
         /// </summary>
-        public enum FillModel { 空出第一个单元格, 列标题填充, 行标题填充 };
+        public enum FillModel { 空出第一个单元格, 列标题填充, 行标题填充 ,没有标题};
 
-        #region 常规方式
+        #region 常规方式 没有样式
         /// <summary>
         /// 创建具有行列(可选)标题的Excel文件
         /// </summary>
@@ -145,11 +145,12 @@ namespace ExcelHelperLib
 
         #region 使用模板
         /// <summary>
-        /// 使用指定的Excel模板创建Excel文件
+        /// 使用指定的Excel模板创建Excel文件 标题可以直接写入SCells中
         /// </summary>
         /// <param name="FormatType">模板</param>
         /// <param name="Save">是否直接保存</param>
         /// <returns></returns>
+       [Obsolete("已过时  请使用InsertData 新版不再将标题单独区分")]
         public static Workbook CreateExcel(ExcelFormat FormatType,bool Save = true)
         {
             //实例化workbook对象
@@ -162,6 +163,8 @@ namespace ExcelHelperLib
             //有行标题
             if (FormatType.Columns.Count>0)
             {
+                //设置第一行行高
+                cells.SetRowHeight(0, FormatType.RowsSize);
                 for (int i = 0; i < FormatType.Columns.Count; i++)
                 {
                     //设置列宽
@@ -172,13 +175,15 @@ namespace ExcelHelperLib
                     cells[0, FormatType.Columns[i].Y].SetStyle(FormatType.Columns[i].CreateStyle());
                 }
             }
-            //有列标题
+            //有行标题
             if (FormatType.Rows.Count>0)
             {
+                //设置第一列列宽
+                cells.SetColumnWidth(0, FormatType.ColumnsSize);
                 for (int i = 0; i < FormatType.Rows.Count; i++)
                 {
                     //设置行高
-                    cells.SetColumnWidth(i, FormatType.RowsSize);
+                    cells.SetRowHeight(i, FormatType.RowsSize);
                     //单元格赋值
                     cells[FormatType.Rows[i].X, 0].PutValue(FormatType.Rows[i].Txt_Obj);
                     //设置样式
@@ -191,6 +196,11 @@ namespace ExcelHelperLib
             {
                 foreach(var cell in FormatType.SCells)
                 {
+                    //设置行高
+                    cells.SetRowHeight(cell.X, FormatType.RowsSize);
+                    //设置列宽
+                    cells.SetColumnWidth(cell.Y, FormatType.ColumnsSize);
+                     //设置文字换行
                     //单元格赋值
                     cells[cell.X, cell.Y].PutValue(cell.Txt_Obj);
                     //设置样式
@@ -212,6 +222,54 @@ namespace ExcelHelperLib
             }
   
             return workbook;
+        }
+
+        /// <summary>
+        /// 插入数据到Excel
+        /// </summary>
+        /// <param name="EFormat">Excel模板</param>
+        /// <param name="book">Workbook对象</param>
+        /// <param name="Save">是否自动保存</param>
+        /// <returns></returns>
+       public static void InsertData(ExcelFormat EFormat, bool Save = false, Workbook book = null)
+        {
+            if(book == null)
+            {
+                book = new Workbook();
+            }
+            if (String.IsNullOrEmpty(EFormat.SavePath))
+            {
+                Exception ex = new Exception("保存路径为空");
+                throw ex;
+            }
+            var cells = book.Worksheets[EFormat.SheetIndex].Cells;
+
+            if (EFormat.SCells.Count > 0)
+            {
+                foreach (var cell in EFormat.SCells)
+                {
+                    //设置行高
+                    cells.SetRowHeight(cell.X, EFormat.RowsSize);
+                    //设置列宽
+                    cells.SetColumnWidth(cell.Y, EFormat.ColumnsSize);
+                    //单元格赋值
+                    cells[cell.X, cell.Y].PutValue(cell.Txt_Obj);
+                    //设置样式
+                    cells[cell.X, cell.Y].SetStyle(cell.CreateStyle());
+                }
+            }
+                if(Save)
+            {
+                try
+                {
+                    book.Save(EFormat.SavePath);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("保存失败");
+                    throw ex;
+                }
+            }
         }
         #endregion
     }

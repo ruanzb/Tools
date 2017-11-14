@@ -133,12 +133,12 @@ namespace ExcelHelperLib
         /// <summary>
         /// 字体大小
         /// </summary>
-        int _Size = 10;
+        int _FontSize = 10;
 
-        public int Size
+        public int FontSize
         {
-            get { return _Size; }
-            set { _Size = value; }
+            get { return _FontSize; }
+            set { _FontSize = value; }
         }
 
         /// <summary>
@@ -152,6 +152,43 @@ namespace ExcelHelperLib
             set { _IsBold = value; }
         }
 
+        #endregion
+
+        #region 对齐
+       /// <summary>
+        /// 文字水平对齐方式 默认居中
+        /// </summary>
+        TextAlignmentType _HorizontalAlignment = TextAlignmentType.Center;
+
+        public TextAlignmentType HorizontalAlignment
+        {
+            get { return _HorizontalAlignment; }
+            set { _HorizontalAlignment = value; }
+        }
+
+        /// <summary>
+        /// 文字竖直对齐方式 默认居中
+        /// </summary>
+        TextAlignmentType _VerticalAlignment = TextAlignmentType.Center;
+
+        public TextAlignmentType VerticalAlignment
+        {
+            get { return _VerticalAlignment; }
+            set { _VerticalAlignment = value; }
+        }
+        #endregion
+
+        #region 换行
+        /// <summary>
+        /// 是否自动换行
+        /// </summary>
+        bool _IsTextWrapped = false;
+
+        public bool IsTextWrapped
+        {
+            get { return _IsTextWrapped; }
+            set { _IsTextWrapped = value; }
+        }
         #endregion
     }
 }

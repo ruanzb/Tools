@@ -14,6 +14,7 @@ using System.Linq;
 using System.Text;
 using System.Drawing;
 using Aspose.Cells;
+using System.IO;
 #endregion
 
 namespace ExcelHelperLib
@@ -23,7 +24,25 @@ namespace ExcelHelperLib
     /// </summary>
     public class ExcelFormat:StyleFormat
     {
+
+
         public enum TitleType { 列标题, 行标题 };
+
+
+        #region 构造函数
+        public ExcelFormat()
+        {
+
+        }
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="SavePath"></param>
+        public ExcelFormat(String SavePath)
+        {
+            this.SavePath = SavePath;
+        }
+        #endregion
 
         #region Excel内容相关
         /// <summary>
@@ -40,8 +59,10 @@ namespace ExcelHelperLib
         /// <summary>
         /// 列标题
         /// </summary>
+        /// 
         List<SCell> _Columns = new List<SCell>();
 
+        [Obsolete("已过时 新版不再将标题单独区分")]
         public List<SCell> Columns
         {
             get { return _Columns; }
@@ -51,7 +72,7 @@ namespace ExcelHelperLib
         /// 行标题
         /// </summary>
         List<SCell> _Rows = new List<SCell>();
-
+        [Obsolete("已过时 新版不再将标题单独区分")]
         public List<SCell> Rows
         {
             get { return _Rows; }
@@ -104,8 +125,12 @@ namespace ExcelHelperLib
         /// <param name="Style">标题单元格样式</param>
         /// <param name="TitleType">标题类型 1列标题 2行标题</param>
         /// <param name="FillModel">(0,0)单元格填充模式</param>
-        public void CreateTitle(IList<object> Inner_objlist, CellStyle Style, TitleType TitleType =  TitleType.列标题, ExcelMethod.FillModel FillModel = ExcelMethod.FillModel.空出第一个单元格)
+        public void InsertTitle(IList<object> Inner_objlist, CellStyle Style, TitleType TitleType =  TitleType.列标题, ExcelMethod.FillModel FillModel = ExcelMethod.FillModel.空出第一个单元格)
         {
+            if(FillModel == ExcelMethod.FillModel.没有标题)
+            {
+                return;
+            }
             for(int i = 0;i<Inner_objlist.Count;i++)
             {
                 SCell scell = new SCell();
@@ -121,8 +146,7 @@ namespace ExcelHelperLib
                     {
                         scell.Y = i+1;
                     }
-
-                    this.Columns.Add(scell);
+                    this.SCells.Add(scell);
                 }
                 else if(TitleType ==  ExcelFormat.TitleType.行标题)
                 {
@@ -134,11 +158,47 @@ namespace ExcelHelperLib
                     {
                         scell.X = i + 1;
                     }
-
-                    this.Rows.Add(scell);
+                    this.SCells.Add(scell);
                 }
             }
         }
 
+        /// <summary>
+        /// 插入一行数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="row"></param>
+        /// <param name="CStyle"></param>
+        public void InsertCellRow(CellRow row,CellStyle CStyle)
+        {
+            for(int i = row.LeftIndex;i<row.RightIndex;i++)
+            {
+                SCell scell = new SCell();
+                scell.CStyle = CStyle;
+                scell.X = i;
+                scell.Y = row.RowIndex;
+                if(row.Is_Pic)
+                {
+                    scell.Image_Ms = (MemoryStream)(object)row.Obj_List[i - row.LeftIndex];
+                }
+                else
+                {
+                    scell.Txt_Obj = (object)row.Obj_List[i-row.LeftIndex];
+                }
+                this.SCells.Add(scell);
+            }
+        }
+        /// <summary>
+        /// 插入数据块
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="rowlist"></param>
+        /// <param name="CStyle"></param>
+        public void InsetCellBlock(List<CellRow> rowlist,CellStyle CStyle)
+        {
+            rowlist.ForEach((item) => {
+                InsertCellRow(item, CStyle);
+            });
+        }
     }
 }
