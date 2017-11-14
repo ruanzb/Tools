@@ -23,6 +23,7 @@ namespace ExcelHelperLib
     /// </summary>
     public class ExcelFormat:StyleFormat
     {
+        public enum TitleType { 列标题, 行标题 };
 
         #region Excel内容相关
         /// <summary>
@@ -103,14 +104,14 @@ namespace ExcelHelperLib
         /// <param name="Style">标题单元格样式</param>
         /// <param name="TitleType">标题类型 1列标题 2行标题</param>
         /// <param name="FillModel">(0,0)单元格填充模式</param>
-        public void CreateTitle(IList<object> Inner_objlist,CellStyle Style,int TitleType = 1,ExcelMethod.FillModel FillModel = ExcelMethod.FillModel.空出第一个单元格)
+        public void CreateTitle(IList<object> Inner_objlist, CellStyle Style, TitleType TitleType =  TitleType.列标题, ExcelMethod.FillModel FillModel = ExcelMethod.FillModel.空出第一个单元格)
         {
             for(int i = 0;i<Inner_objlist.Count;i++)
             {
                 SCell scell = new SCell();
                 scell.CStyle = Style;
                 scell.Txt_Obj = Inner_objlist[i];
-                if (TitleType == 1)
+                if (TitleType ==  ExcelFormat.TitleType.列标题)
                 {
                     if (FillModel == ExcelMethod.FillModel.列标题填充)
                     {
@@ -123,7 +124,7 @@ namespace ExcelHelperLib
 
                     this.Columns.Add(scell);
                 }
-                else if(TitleType == 2)
+                else if(TitleType ==  ExcelFormat.TitleType.行标题)
                 {
                     if (FillModel == ExcelMethod.FillModel.行标题填充)
                     {
