@@ -10,10 +10,6 @@
 #region 名空间
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Drawing;
-using Aspose.Cells;
 using System.IO;
 #endregion
 
@@ -24,10 +20,16 @@ namespace ExcelHelperLib
     /// </summary>
     public class ExcelFormat:StyleFormat
     {
-
-
+        #region 枚举声明
+        /// <summary>
+        /// 对位于1,1的单元格的填充方式
+        /// </summary>
+        public enum FillModel { 空出第一个单元格, 列标题填充, 行标题填充, 没有标题 };
+        /// <summary>
+        /// 标题类型
+        /// </summary>
         public enum TitleType { 列标题, 行标题 };
-
+        #endregion
 
         #region 构造函数
         public ExcelFormat()
@@ -118,39 +120,40 @@ namespace ExcelHelperLib
         
         #endregion
 
+        #region 内容插入方法
         /// <summary>
-        /// 添加标题
+        /// 插入标题
         /// </summary>
         /// <param name="Inner_objlist">标题填充内容List</param>
         /// <param name="Style">标题单元格样式</param>
         /// <param name="TitleType">标题类型 1列标题 2行标题</param>
         /// <param name="FillModel">(0,0)单元格填充模式</param>
-        public void InsertTitle(IList<object> Inner_objlist, CellStyle Style, TitleType TitleType =  TitleType.列标题, ExcelMethod.FillModel FillModel = ExcelMethod.FillModel.空出第一个单元格)
+        public void InsertTitle(IList<object> Inner_objlist, CellStyle Style, TitleType TitleType = TitleType.列标题, FillModel FillModel = FillModel.空出第一个单元格)
         {
-            if(FillModel == ExcelMethod.FillModel.没有标题)
+            if (FillModel == FillModel.没有标题)
             {
                 return;
             }
-            for(int i = 0;i<Inner_objlist.Count;i++)
+            for (int i = 0; i < Inner_objlist.Count; i++)
             {
                 SCell scell = new SCell();
                 scell.CStyle = Style;
                 scell.Txt_Obj = Inner_objlist[i];
-                if (TitleType ==  ExcelFormat.TitleType.列标题)
+                if (TitleType == ExcelFormat.TitleType.列标题)
                 {
-                    if (FillModel == ExcelMethod.FillModel.列标题填充)
+                    if (FillModel == FillModel.列标题填充)
                     {
                         scell.Y = i;
                     }
                     else
                     {
-                        scell.Y = i+1;
+                        scell.Y = i + 1;
                     }
                     this.SCells.Add(scell);
                 }
-                else if(TitleType ==  ExcelFormat.TitleType.行标题)
+                else if (TitleType == ExcelFormat.TitleType.行标题)
                 {
-                    if (FillModel == ExcelMethod.FillModel.行标题填充)
+                    if (FillModel == FillModel.行标题填充)
                     {
                         scell.X = i;
                     }
@@ -169,36 +172,79 @@ namespace ExcelHelperLib
         /// <typeparam name="T"></typeparam>
         /// <param name="row"></param>
         /// <param name="CStyle"></param>
-        public void InsertCellRow(CellRow row,CellStyle CStyle)
+        public void InsertCellRow(CellRow row, CellStyle CStyle)
         {
-            for(int i = row.LeftIndex;i<row.RightIndex;i++)
+            for (int i = row.LeftIndex; i < row.RightIndex; i++)
             {
                 SCell scell = new SCell();
                 scell.CStyle = CStyle;
                 scell.X = i;
                 scell.Y = row.RowIndex;
-                if(row.Is_Pic)
+                if (row.Is_Pic)
                 {
                     scell.Image_Ms = (MemoryStream)(object)row.Obj_List[i - row.LeftIndex];
                 }
                 else
                 {
-                    scell.Txt_Obj = (object)row.Obj_List[i-row.LeftIndex];
+                    scell.Txt_Obj = (object)row.Obj_List[i - row.LeftIndex];
                 }
                 this.SCells.Add(scell);
             }
         }
         /// <summary>
-        /// 插入数据块
+        /// 插入多行数据块
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="rowlist"></param>
         /// <param name="CStyle"></param>
-        public void InsetCellBlock(List<CellRow> rowlist,CellStyle CStyle)
+        public void InsetCellBlock(List<CellRow> rowlist, CellStyle CStyle)
         {
-            rowlist.ForEach((item) => {
+            rowlist.ForEach((item) =>
+            {
                 InsertCellRow(item, CStyle);
             });
         }
+
+        /// <summary>
+        /// 插入一列数据
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="clom"></param>
+        /// <param name="CStyle"></param>
+        public void InsertCellColm(CellColm clom, CellStyle CStyle)
+        {
+            for (int i = clom.TopIndex; i < clom.ButtomIndex; i++)
+            {
+                SCell scell = new SCell();
+                scell.CStyle = CStyle;
+                scell.X = clom.ColmIndex;
+                scell.Y = i;
+                if (clom.Is_Pic)
+                {
+                    scell.Image_Ms = (MemoryStream)(object)clom.Obj_List[i - clom.TopIndex];
+                }
+                else
+                {
+                    scell.Txt_Obj = (object)clom.Obj_List[i - clom.TopIndex];
+                }
+                this.SCells.Add(scell);
+            }
+        }
+
+        /// <summary>
+        /// 插入多列数据块
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="rowlist"></param>
+        /// <param name="CStyle"></param>
+        public void InsetCellBlock(List<CellColm> rowlist, CellStyle CStyle)
+        {
+            rowlist.ForEach((item) =>
+            {
+                InsertCellColm(item, CStyle);
+            });
+        }
+        #endregion
+
     }
 }

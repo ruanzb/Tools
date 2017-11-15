@@ -22,10 +22,6 @@ namespace ExcelHelperLib
 {
     public class ExcelMethod
     {
-        /// <summary>
-        /// 对位于1,1的单元格的填充方式
-        /// </summary>
-        public enum FillModel { 空出第一个单元格, 列标题填充, 行标题填充 ,没有标题};
 
         #region 常规方式 没有样式
         /// <summary>
@@ -37,7 +33,7 @@ namespace ExcelHelperLib
         /// <param name="FillModel">对第一个单元格的填充方式</param>
         /// <param name="SheetIndex">Sheet索引  默认使用第一个</param>
         /// <returns></returns>
-        public static Workbook CreateExcel(String filename, String[] Columns = null, String[] Rows = null, FillModel FillModel = FillModel.空出第一个单元格, int SheetIndex = 0)
+        public static Workbook CreateExcel(String filename, String[] Columns = null, String[] Rows = null, ExcelHelperLib.ExcelFormat.FillModel FillModel = ExcelHelperLib.ExcelFormat.FillModel.空出第一个单元格, int SheetIndex = 0)
         {
             //实例化workbook对象
             Workbook workbook = new Workbook();
@@ -51,7 +47,7 @@ namespace ExcelHelperLib
             {
                 for (int i = 0; i < Columns.Length; i++)
                 {
-                    if (FillModel == FillModel.列标题填充)
+                    if (FillModel == ExcelFormat.FillModel.列标题填充)
                     {
                         //默认列宽25
                         cells.SetColumnWidth(i, 25);
@@ -72,7 +68,7 @@ namespace ExcelHelperLib
             {
                 for (int i = 0; i < Rows.Length; i++)
                 {
-                    if (FillModel == FillModel.行标题填充)
+                    if (FillModel == ExcelFormat.FillModel.行标题填充)
                     {
                         //默认行高10
                         cells.SetColumnWidth(i, 10);

@@ -39,8 +39,5 @@ namespace ExcelHelperLib
             get { return _RowsSize; }
             set { _RowsSize = value; }
         }
-
-   
-
     }
 }

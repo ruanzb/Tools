@@ -43,13 +43,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="CellBase.cs" />
-    <Compile Include="CellRow.cs" />
+    <Compile Include="CellInfo.cs" />
+    <Compile Include="CellBlock.cs" />
     <Compile Include="CellStyle.cs" />
     <Compile Include="ExcelFormat.cs" />
     <Compile Include="ExcelMethod.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="SCell.cs" />
     <Compile Include="StyleFormat.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
