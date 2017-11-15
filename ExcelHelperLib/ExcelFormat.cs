@@ -178,8 +178,8 @@ namespace ExcelHelperLib
             {
                 SCell scell = new SCell();
                 scell.CStyle = CStyle;
-                scell.X = i;
-                scell.Y = row.RowIndex;
+                scell.Y = i;
+                scell.X = row.RowIndex;
                 if (row.Is_Pic)
                 {
                     scell.Image_Ms = (MemoryStream)(object)row.Obj_List[i - row.LeftIndex];
@@ -217,8 +217,8 @@ namespace ExcelHelperLib
             {
                 SCell scell = new SCell();
                 scell.CStyle = CStyle;
-                scell.X = clom.ColmIndex;
-                scell.Y = i;
+                scell.Y = clom.ColmIndex;
+                scell.X = i;
                 if (clom.Is_Pic)
                 {
                     scell.Image_Ms = (MemoryStream)(object)clom.Obj_List[i - clom.TopIndex];
