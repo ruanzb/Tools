@@ -174,7 +174,7 @@ namespace ExcelHelperLib
         /// <param name="CStyle"></param>
         public void InsertCellRow(CellRow row, CellStyle CStyle)
         {
-            for (int i = row.LeftIndex; i < row.RightIndex; i++)
+            for (int i = row.LeftIndex; i <= row.RightIndex; i++)
             {
                 SCell scell = new SCell();
                 scell.CStyle = CStyle;
@@ -213,7 +213,7 @@ namespace ExcelHelperLib
         /// <param name="CStyle"></param>
         public void InsertCellColm(CellColm clom, CellStyle CStyle)
         {
-            for (int i = clom.TopIndex; i < clom.ButtomIndex; i++)
+            for (int i = clom.TopIndex; i <= clom.ButtomIndex; i++)
             {
                 SCell scell = new SCell();
                 scell.CStyle = CStyle;

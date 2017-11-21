@@ -230,6 +230,10 @@ namespace HttpToolsLib
                         #endregion
                     }
                 }
+                else
+                {
+                    return false;
+                }
             }
             catch (System.Exception)
             {
@@ -386,7 +390,6 @@ namespace HttpToolsLib
 
             return img;
         }
-
         #endregion
 
         #region Http请求
@@ -485,6 +488,10 @@ namespace HttpToolsLib
             Encoding encoding = Encoding.UTF8;
             String retString = null;
             var request = Httpinfo.CreatRequest();
+            if(request == null&&Httpinfo.CheckUrl)
+            {
+                retString = "Url校验未通过";
+            }
             try
             {
                 if (request != null)

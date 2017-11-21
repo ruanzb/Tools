@@ -69,10 +69,10 @@ namespace ExcelHelperLib
         /// <param name="right"></param>
         /// <param name="rowindex"></param>
         /// <param name="objlist"></param>
-        public CellRow(int left,int right,int rowindex ,List<object> objlist )
+        public CellRow(int left,int rowindex ,List<object> objlist )
         {
             this.LeftIndex = left;
-            this.RightIndex = right;
+            this.RightIndex = left+objlist.Count-1;
             this.RowIndex = rowindex;
             this.Obj_List = objlist;
         }
@@ -83,10 +83,10 @@ namespace ExcelHelperLib
         /// <param name="right"></param>
         /// <param name="rowindex"></param>
         /// <param name="objlist"></param>
-        public CellRow(int left, int right, int rowindex, List<MemoryStream> Pic_List)
+        public CellRow(int left, int rowindex, List<MemoryStream> Pic_List)
         {
             this.LeftIndex = left;
-            this.RightIndex = right;
+            this.RightIndex = left + Pic_List.Count - 1;
             this.RowIndex = rowindex;
             this.Pic_List = Pic_List;
             Is_Pic = true;
@@ -140,10 +140,10 @@ namespace ExcelHelperLib
         /// <param name="right"></param>
         /// <param name="rowindex"></param>
         /// <param name="objlist"></param>
-        public CellColm(int top, int buttom, int clomindex, List<object> objlist)
+        public CellColm(int top, int clomindex, List<object> objlist)
         {
             this.TopIndex = top;
-            this.ButtomIndex = buttom;
+            this.ButtomIndex = top + objlist.Count - 1;
             this.ColmIndex = clomindex;
             this.Obj_List = objlist;
         }
@@ -154,10 +154,10 @@ namespace ExcelHelperLib
         /// <param name="buttom"></param>
         /// <param name="clomindex"></param>
         /// <param name="objlist"></param>
-        public CellColm(int top, int buttom, int clomindex, List<MemoryStream> Pic_List)
+        public CellColm(int top, int clomindex, List<MemoryStream> Pic_List)
         {
             this.TopIndex = top;
-            this.ButtomIndex = buttom;
+            this.ButtomIndex = top + Pic_List.Count - 1;
             this.ColmIndex = clomindex;
             this.Pic_List = Pic_List;
             Is_Pic = true;

@@ -262,7 +262,7 @@ namespace HttpToolsLib
         /// <summary>
         /// Http版本类型 默认为HttpVersion.Version10
         /// </summary>
-        private Version _ProtocolVersion = HttpVersion.Version10;
+        private Version _ProtocolVersion = HttpVersion.Version11;
 
         public Version ProtocolVersion
         {
