@@ -19,21 +19,21 @@ namespace ExcelHelperLib
     /// </summary>
    public  class StyleFormat
     {
+     
+        int _ColumnsSize = 20;
         /// <summary>
         /// 列宽
         /// </summary>
-        int _ColumnsSize = 20;
-
         public int ColumnsSize
         {
             get { return _ColumnsSize; }
             set { _ColumnsSize = value; }
         }
+  
+        int _RowsSize = 10;
         /// <summary>
         /// 行高
         /// </summary>
-        int _RowsSize = 10;
-
         public int RowsSize
         {
             get { return _RowsSize; }

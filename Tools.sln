@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 2013
-VisualStudioVersion = 12.0.21005.1
+# Visual Studio 15
+VisualStudioVersion = 15.0.27130.2010
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HttpToolsLib", "HttpToolsLib\HttpToolsLib.csproj", "{B2D258F5-F9F6-4F39-A5A3-5B66CDF04B8B}"
 EndProject
@@ -37,7 +37,7 @@ Global
 		{393C4598-0B4D-45A7-A017-FA945DBB8335}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{393C4598-0B4D-45A7-A017-FA945DBB8335}.Debug|x64.ActiveCfg = Debug|x64
 		{393C4598-0B4D-45A7-A017-FA945DBB8335}.Debug|x64.Build.0 = Debug|x64
-		{393C4598-0B4D-45A7-A017-FA945DBB8335}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{393C4598-0B4D-45A7-A017-FA945DBB8335}.Debug|x86.ActiveCfg = Debug|x86
 		{393C4598-0B4D-45A7-A017-FA945DBB8335}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{393C4598-0B4D-45A7-A017-FA945DBB8335}.Release|Any CPU.Build.0 = Release|Any CPU
 		{393C4598-0B4D-45A7-A017-FA945DBB8335}.Release|x64.ActiveCfg = Release|x64
@@ -62,5 +62,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {F24DE17A-F746-444C-A322-A987547A7824}
 	EndGlobalSection
 EndGlobal

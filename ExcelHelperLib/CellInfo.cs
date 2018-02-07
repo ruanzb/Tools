@@ -66,9 +66,9 @@ namespace ExcelHelperLib
         /// <summary>
         /// 普通文本
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="data"></param>
+        /// <param name="x">行号</param>
+        /// <param name="y">列号</param>
+        /// <param name="data">填充数据</param>
         public CellBase(int x, int y, object data)
         {
             this.X = x;
@@ -79,9 +79,9 @@ namespace ExcelHelperLib
         /// <summary>
         /// 图片流
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="data"></param>
+        /// <param name="x">行号</param>
+        /// <param name="y">列号</param>
+        /// <param name="data">填充数据</param>
         public CellBase(int x, int y, MemoryStream data)
         {
             this.X = x;
@@ -93,9 +93,9 @@ namespace ExcelHelperLib
         /// <summary>
         /// 图片流
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="data"></param>
+        /// <param name="x">行号</param>
+        /// <param name="y">列号</param>
+        /// <param name="data">填充数据</param>
         public CellBase(int x, int y, Image data,System.Drawing.Imaging.ImageFormat format_type)
         {
             this.X = x;

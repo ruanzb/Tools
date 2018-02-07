@@ -12,6 +12,8 @@
 using Aspose.Cells;
 using System;
 using System.Collections.Generic;
+using System.Data;
+using System.Data.OleDb;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -146,8 +148,8 @@ namespace ExcelHelperLib
         /// <param name="FormatType">模板</param>
         /// <param name="Save">是否直接保存</param>
         /// <returns></returns>
-       [Obsolete("已过时  请使用InsertData 新版不再将标题单独区分")]
-        public static Workbook CreateExcel(ExcelFormat FormatType,bool Save = true)
+        [Obsolete("已过时  请使用InsertData 新版不再将标题单独区分")]
+        public static Workbook CreateExcel(ExcelFormat FormatType, bool Save = true)
         {
             //实例化workbook对象
             Workbook workbook = new Workbook();
@@ -155,9 +157,9 @@ namespace ExcelHelperLib
             Worksheet sheet = (Worksheet)workbook.Worksheets[FormatType.SheetIndex];
             //获得指定Sheet中的所有单元格
             Cells cells = sheet.Cells;
-          
+
             //有行标题
-            if (FormatType.Columns.Count>0)
+            if (FormatType.Columns.Count > 0)
             {
                 //设置第一行行高
                 cells.SetRowHeight(0, FormatType.RowsSize);
@@ -172,7 +174,7 @@ namespace ExcelHelperLib
                 }
             }
             //有行标题
-            if (FormatType.Rows.Count>0)
+            if (FormatType.Rows.Count > 0)
             {
                 //设置第一列列宽
                 cells.SetColumnWidth(0, FormatType.ColumnsSize);
@@ -188,15 +190,15 @@ namespace ExcelHelperLib
                 }
             }
 
-            if(FormatType.SCells.Count>0)
+            if (FormatType.SCells.Count > 0)
             {
-                foreach(var cell in FormatType.SCells)
+                foreach (var cell in FormatType.SCells)
                 {
                     //设置行高
                     cells.SetRowHeight(cell.X, FormatType.RowsSize);
                     //设置列宽
                     cells.SetColumnWidth(cell.Y, FormatType.ColumnsSize);
-                     //设置文字换行
+                    //设置文字换行
                     //单元格赋值
                     cells[cell.X, cell.Y].PutValue(cell.Txt_Obj);
                     //设置样式
@@ -204,7 +206,7 @@ namespace ExcelHelperLib
                 }
             }
 
-            if(Save)
+            if (Save)
             {
                 try
                 {
@@ -216,7 +218,7 @@ namespace ExcelHelperLib
                     throw ex;
                 }
             }
-  
+
             return workbook;
         }
 
@@ -224,12 +226,12 @@ namespace ExcelHelperLib
         /// 插入数据到Excel
         /// </summary>
         /// <param name="EFormat">Excel模板</param>
-        /// <param name="book">Workbook对象</param>
         /// <param name="Save">是否自动保存</param>
+        /// <param name="book">Workbook对象</param>
         /// <returns></returns>
-       public static void InsertData(ExcelFormat EFormat, bool Save = false, Workbook book = null)
+        public static void InsertData(ExcelFormat EFormat, bool Save = false, Workbook book = null)
         {
-            if(book == null)
+            if (book == null)
             {
                 book = new Workbook();
             }
@@ -254,7 +256,7 @@ namespace ExcelHelperLib
                     cells[cell.X, cell.Y].SetStyle(cell.CreateStyle());
                 }
             }
-                if(Save)
+            if (Save)
             {
                 try
                 {
@@ -267,6 +269,8 @@ namespace ExcelHelperLib
                 }
             }
         }
+
+
         #endregion
     }
 }

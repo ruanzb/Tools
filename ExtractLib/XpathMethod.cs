@@ -49,7 +49,7 @@ namespace ExtractLib
         }
         #endregion
 
-        #region 静态方法 
+        #region 对象方法 
         /// <summary>
         /// 抽取单个node的内容
         /// </summary>
@@ -221,7 +221,7 @@ namespace ExtractLib
         }
         #endregion
 
-        #region 动态方法 通过对象调用 多线程环境下建议用这种方式 资源消耗小
+        #region 动态方法 通过对象调用 多线程环境下建议用这种方式 
         /// <summary>
         /// 抽取单条 
         /// </summary>

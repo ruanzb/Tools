@@ -137,7 +137,6 @@ namespace PControlsLib
                 (Control as Control).Text = txt;
             }
         }
-
         /// <summary>
         /// 改变控件的Enable属性
         /// </summary>

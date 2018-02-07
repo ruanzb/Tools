@@ -169,9 +169,8 @@ namespace ExcelHelperLib
         /// <summary>
         /// 插入一行数据
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="row"></param>
-        /// <param name="CStyle"></param>
+        /// <param name="row">待插入的数据行</param>
+        /// <param name="CStyle">数据行统一单元格样式</param>
         public void InsertCellRow(CellRow row, CellStyle CStyle)
         {
             for (int i = row.LeftIndex; i <= row.RightIndex; i++)
@@ -194,9 +193,8 @@ namespace ExcelHelperLib
         /// <summary>
         /// 插入多行数据块
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="rowlist"></param>
-        /// <param name="CStyle"></param>
+        /// <param name="rowlist">待插入数据行列表</param>
+        /// <param name="CStyle">数据块统一单元格样式</param>
         public void InsetCellBlock(List<CellRow> rowlist, CellStyle CStyle)
         {
             rowlist.ForEach((item) =>
@@ -208,9 +206,8 @@ namespace ExcelHelperLib
         /// <summary>
         /// 插入一列数据
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="clom"></param>
-        /// <param name="CStyle"></param>
+        /// <param name="rowlist">待插入数据列列表</param>
+        /// <param name="CStyle">数据列统一单元格样式</param>
         public void InsertCellColm(CellColm clom, CellStyle CStyle)
         {
             for (int i = clom.TopIndex; i <= clom.ButtomIndex; i++)
@@ -234,9 +231,8 @@ namespace ExcelHelperLib
         /// <summary>
         /// 插入多列数据块
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="rowlist"></param>
-        /// <param name="CStyle"></param>
+        /// <param name="rowlist">待插入数据列列表</param>
+        /// <param name="CStyle">数据块统一单元格样式</param>
         public void InsetCellBlock(List<CellColm> rowlist, CellStyle CStyle)
         {
             rowlist.ForEach((item) =>

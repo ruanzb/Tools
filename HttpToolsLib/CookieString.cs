@@ -10,6 +10,7 @@
 #region 名空间
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 #endregion
@@ -83,8 +84,7 @@ namespace HttpToolsLib
                 //以;为界分割
                 String[] StringArray = Cookie.Split(';');
                 String[] SingleArray;
-                Parallel.ForEach(StringArray, singlecookiestr =>
-                {
+                StringArray.ToList().ForEach(singlecookiestr=> {
                     //以=为界分割
                     SingleArray = singlecookiestr.Split('=');
                     //将cookie名称转化为小写并trim()
@@ -99,6 +99,10 @@ namespace HttpToolsLib
                         Cookielist.Add(sc);
                     }
                 });
+                //Parallel.ForEach(StringArray, singlecookiestr =>
+                //{
+      
+                //});
             }
             catch
             {
@@ -150,7 +154,7 @@ namespace HttpToolsLib
             }
         }
         /// <summary>
-        /// 转化为字符串
+        /// 转化CookieString对象为字符串
         /// </summary>
         /// <returns></returns>
         public String ConventToString()
@@ -197,7 +201,7 @@ namespace HttpToolsLib
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="Cookie"></param>
+        /// <param name="Cookie">Cookie数组 Key=Value格式</param>
         public SingleCookie(String[] Cookie)
         {
             //防止数组越界

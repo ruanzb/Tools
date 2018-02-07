@@ -3,3 +3,15 @@
 ################################################################################
 
 /DBMethods
+/ExcelHelperLib/bin/Release
+/.vs/Tools/v15/Server/sqlite3
+/ExcelHelperLib/obj/Release
+/ExtractLib/bin/x86/Debug
+/ExtractLib/bin/x64/Debug
+/ExtractLib/bin/Release
+/ExcelHelperLib/obj/Debug
+/HttpToolsLib/bin/Release
+/HttpToolsLib/bin/x64/Debug
+/HttpToolsLib/bin/x86/Debug
+/PControlsLib/bin/Release
+/PControlsLib/obj/Release

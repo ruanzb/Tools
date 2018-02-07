@@ -84,7 +84,7 @@ namespace ExtractLib
                 {
                     retStr = retStr.Trim();
                 }
-            
+                reg = null;
             }
             return retStr;
         }

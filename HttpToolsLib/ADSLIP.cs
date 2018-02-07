@@ -8,9 +8,12 @@
 #endregion
 
 #region 名空间
+using DotRas;
 using System;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -21,13 +24,14 @@ namespace HttpToolsLib
     /// <summary>
     /// ADSL拨号帮助类 用批处理实现
     /// </summary>
+    [Obsolete("过时  改用RAS")]
     public class ADSLIP
     {
         #region 变量
         /// <summary>
         ///生成的临时批处理文件名称
         /// </summary>
-        static String _temppath = "emp.bat";
+        static String _temppath = "temp.bat";
         public static String temppath
         {
             get { return ADSLIP._temppath; }
@@ -57,7 +61,7 @@ namespace HttpToolsLib
         /// <param name="ADSL_Name">宽带连接名称</param>
         /// <param name="ADSL_UserName">宽带连接用户名</param>
         /// <param name="ADSL_PassWord">宽带连接密码</param>
-        public static void ChangeIp(String ADSL_Name = "宽带连接", String ADSL_UserName = "057476269528", String ADSL_PassWord = "147262")
+        public static void ChangeIp(String ADSL_Name = "宽带连接", String ADSL_UserName = "057475534480", String ADSL_PassWord = "578411")
         {
             sb.Clear();
             sb.AppendLine("@echo off");
@@ -78,17 +82,18 @@ namespace HttpToolsLib
             }
             Process.Start(temppath);
             System.Threading.Thread.Sleep(delay * 1000);
+            int i = 0;
             while (!HttpMethod.CheckIp(null))
             {
                 Process.Start(temppath);
-                System.Threading.Thread.Sleep(2 * delay * 1000);
+                System.Threading.Thread.Sleep((++i) * delay * 1000);
             }
             File.Delete(temppath);
         }
         /// <summary>
         /// 获得本地ip
         /// </summary>
-        /// <returns></returns>
+        /// <returns>本地ip地址</returns>
         public static String GetIP()
         {
             ///获取本地的IP地址
@@ -107,7 +112,7 @@ namespace HttpToolsLib
         /// <summary>
         /// 获得公网ip
         /// </summary>
-        /// <returns></returns>
+        /// <returns>公网IP地址</returns>
         public static String GetPublicIP()
         {
             HttpHelper helper = new HttpHelper();
@@ -132,7 +137,12 @@ namespace HttpToolsLib
             }
             return ip;
         }
-
+        /// <summary>
+        /// 代理Ip校验
+        /// </summary>
+        /// <param name="Ip">待校验代理IP</param>
+        /// <param name="CheckUrl">检验地址</param>
+        /// <returns></returns>
         public static bool CheckIp(String Ip, String CheckUrl = "http://2017.ip138.com/ic.asp")
         {
             HttpHelper helper = new HttpHelper();
@@ -154,7 +164,7 @@ namespace HttpToolsLib
         /// 判断是否为正确的IP地址，IP范围（0.0.0.0～255.255.255）
         /// </summary>
         /// <param name="ip">需验证的IP地址</param>
-        /// <returns></returns>
+        /// <returns>是否为正确的IP地址</returns>
         public bool IsIP(String ip)
         {
             return System.Text.RegularExpressions.Regex.Match(ip, @"^(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[1-9]|0)\.(25[0-5]|2[0-4][0-9]|[0-1]{1}[0-9]{2}|[1-9]{1}[0-9]{1}|[0-9])$").Success;
@@ -188,5 +198,88 @@ namespace HttpToolsLib
             return 0;
         }
         #endregion
+    }
+
+    /// <summary>
+    /// ADSL拨号帮助类 用DotRas实现
+    /// </summary>
+
+    public class RASDisplay
+    {
+        /// <summary>
+        /// 创建或更新一个PPPOE连接(指定PPPOE名称)
+        /// </summary>
+        static void CreateOrUpdatePPPOE(string updatePPPOEname)
+        {
+            RasDialer dialer = new RasDialer();
+            RasPhoneBook allUsersPhoneBook = new RasPhoneBook();
+            string path = RasPhoneBook.GetPhoneBookPath(RasPhoneBookType.AllUsers);
+            allUsersPhoneBook.Open(path);
+            // 如果已经该名称的PPPOE已经存在，则更新这个PPPOE服务器地址
+            if (allUsersPhoneBook.Entries.Contains(updatePPPOEname))
+            {
+                allUsersPhoneBook.Entries[updatePPPOEname].PhoneNumber = " ";
+                // 不管当前PPPOE是否连接，服务器地址的更新总能成功，如果正在连接，则需要PPPOE重启后才能起作用
+                allUsersPhoneBook.Entries[updatePPPOEname].Update();
+            }
+            // 创建一个新PPPOE
+            else
+            {
+                string adds = string.Empty;
+                ReadOnlyCollection<RasDevice> readOnlyCollection = RasDevice.GetDevices();
+                //                foreach (var col in readOnlyCollection)
+                //                {
+                //                    adds += col.Name + ":" + col.DeviceType.ToString() + "|||";
+                //                }
+                //                _log.Info("Devices are : " + adds);
+                // Find the device that will be used to dial the connection.
+                RasDevice device = RasDevice.GetDevices().Where(o => o.DeviceType == RasDeviceType.PPPoE).First();
+                RasEntry entry = RasEntry.CreateBroadbandEntry(updatePPPOEname, device);    //建立宽带连接Entry
+                entry.PhoneNumber = " ";
+                allUsersPhoneBook.Entries.Add(entry);
+            }
+        }
+
+        /// <summary>
+        /// 断开 宽带连接
+        /// </summary>
+        public static void Disconnect()
+        {
+            ReadOnlyCollection<RasConnection> conList = RasConnection.GetActiveConnections();
+            foreach (RasConnection con in conList)
+            {
+                con.HangUp();
+            }
+        }
+
+        /// <summary>
+        /// 宽带连接，成功返回true,失败返回 false
+        /// </summary>
+        /// <param name="PPPOEname">宽带连接名称</param>
+        /// <param name="username">宽带账号</param>
+        /// <param name="password">宽带密码</param>
+        /// <returns></returns>
+        public static bool Connect(string PPPOEname, string username, string password, ref string msg)
+        {
+            try
+            {
+                CreateOrUpdatePPPOE(PPPOEname);
+                using (RasDialer dialer = new RasDialer())
+                {
+                    dialer.EntryName = PPPOEname;
+                    dialer.AllowUseStoredCredentials = true;
+                    dialer.Timeout = 1000;
+                    dialer.PhoneBookPath = RasPhoneBook.GetPhoneBookPath(RasPhoneBookType.AllUsers);
+                    dialer.Credentials = new NetworkCredential(username, password);
+                    dialer.Dial();
+                    return true;
+                }
+            }
+            catch (RasException re)
+            {
+                msg = re.ErrorCode + " " + re.Message;
+                return false;
+            }
+        }
     }
 }

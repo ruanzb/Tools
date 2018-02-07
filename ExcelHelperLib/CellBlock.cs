@@ -65,10 +65,9 @@ namespace ExcelHelperLib
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <param name="rowindex"></param>
-        /// <param name="objlist"></param>
+        /// <param name="left">起始列 从0开始</param>
+        /// <param name="rowindex">行号 从0开始</param>
+        /// <param name="objlist">插入单元格的数据列表 object类型</param>
         public CellRow(int left,int rowindex ,List<object> objlist )
         {
             this.LeftIndex = left;
@@ -79,10 +78,9 @@ namespace ExcelHelperLib
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <param name="rowindex"></param>
-        /// <param name="objlist"></param>
+        /// <param name="left">起始列 从0开始</param>
+        /// <param name="rowindex">行号 从0开始</param>
+        /// <param name="objlist">插入单元格的数据列表 MemoryStream图片数据流</param>
         public CellRow(int left, int rowindex, List<MemoryStream> Pic_List)
         {
             this.LeftIndex = left;
@@ -136,10 +134,9 @@ namespace ExcelHelperLib
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="left"></param>
-        /// <param name="right"></param>
-        /// <param name="rowindex"></param>
-        /// <param name="objlist"></param>
+        /// <param name="top">数据列起始行 从0开始</param>
+        /// <param name="clomindex">列号 从0开始</param>
+        /// <param name="objlist">插入单元格的数据列表 object类型</param>
         public CellColm(int top, int clomindex, List<object> objlist)
         {
             this.TopIndex = top;
@@ -150,10 +147,9 @@ namespace ExcelHelperLib
         /// <summary>
         /// 构造函数
         /// </summary>
-        /// <param name="top"></param>
-        /// <param name="buttom"></param>
-        /// <param name="clomindex"></param>
-        /// <param name="objlist"></param>
+        /// <param name="top">数据列起始行 从0开始</param>
+        /// <param name="clomindex">列号 从0开始</param>
+        /// <param name="objlist">插入单元格的数据列表 MemoryStream图片数据流</param>
         public CellColm(int top, int clomindex, List<MemoryStream> Pic_List)
         {
             this.TopIndex = top;

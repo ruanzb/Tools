@@ -1,0 +1,5 @@
+F:\GITS\Tools\HttpToolsLib\bin\x64\Debug\HttpToolsLib.dll
+F:\GITS\Tools\HttpToolsLib\bin\x64\Debug\HttpToolsLib.pdb
+F:\GITS\Tools\HttpToolsLib\obj\x64\Debug\HttpToolsLib.csproj.CoreCompileInputs.cache
+F:\GITS\Tools\HttpToolsLib\obj\x64\Debug\HttpToolsLib.dll
+F:\GITS\Tools\HttpToolsLib\obj\x64\Debug\HttpToolsLib.pdb
