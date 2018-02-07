@@ -27,7 +27,7 @@ namespace HttpToolsLib
         /// <summary>
         ///生成的临时批处理文件名称
         /// </summary>
-        static String _temppath = "temp.bat";
+        static String _temppath = "emp.bat";
         public static String temppath
         {
             get { return ADSLIP._temppath; }
