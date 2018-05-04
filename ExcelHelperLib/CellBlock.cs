@@ -27,9 +27,9 @@ namespace ExcelHelperLib
         /// <summary>
         /// 单元格填充数据  文本
         /// </summary>
-        List<object> _Obj_List = new List<object>();
+        IList<object> _Obj_List = new List<object>();
 
-        public List<object> Obj_List
+        public IList<object> Obj_List
         {
             get { return _Obj_List; }
             set { _Obj_List = value; }
@@ -37,9 +37,9 @@ namespace ExcelHelperLib
         /// <summary>
         /// 单元格填充数据  图片
         /// </summary>
-        List<MemoryStream> _PicList = new List<MemoryStream>();
+        IList<MemoryStream> _PicList = new List<MemoryStream>();
 
-        public List<MemoryStream> Pic_List
+        public IList<MemoryStream> Pic_List
         {
             get { return _PicList; }
             set { _PicList = value; }
@@ -68,10 +68,10 @@ namespace ExcelHelperLib
         /// <param name="left">起始列 从0开始</param>
         /// <param name="rowindex">行号 从0开始</param>
         /// <param name="objlist">插入单元格的数据列表 object类型</param>
-        public CellRow(int left,int rowindex ,List<object> objlist )
+        public CellRow(int left,int rowindex , IList<object> objlist )
         {
             this.LeftIndex = left;
-            this.RightIndex = left+objlist.Count-1;
+            this.RightIndex = left+objlist.Count()-1;
             this.RowIndex = rowindex;
             this.Obj_List = objlist;
         }
@@ -81,10 +81,10 @@ namespace ExcelHelperLib
         /// <param name="left">起始列 从0开始</param>
         /// <param name="rowindex">行号 从0开始</param>
         /// <param name="objlist">插入单元格的数据列表 MemoryStream图片数据流</param>
-        public CellRow(int left, int rowindex, List<MemoryStream> Pic_List)
+        public CellRow(int left, int rowindex, IList<MemoryStream> Pic_List)
         {
             this.LeftIndex = left;
-            this.RightIndex = left + Pic_List.Count - 1;
+            this.RightIndex = left + Pic_List.Count() - 1;
             this.RowIndex = rowindex;
             this.Pic_List = Pic_List;
             Is_Pic = true;
@@ -137,10 +137,10 @@ namespace ExcelHelperLib
         /// <param name="top">数据列起始行 从0开始</param>
         /// <param name="clomindex">列号 从0开始</param>
         /// <param name="objlist">插入单元格的数据列表 object类型</param>
-        public CellColm(int top, int clomindex, List<object> objlist)
+        public CellColm(int top, int clomindex, IList<object> objlist)
         {
             this.TopIndex = top;
-            this.ButtomIndex = top + objlist.Count - 1;
+            this.ButtomIndex = top + objlist.Count() - 1;
             this.ColmIndex = clomindex;
             this.Obj_List = objlist;
         }
@@ -150,10 +150,10 @@ namespace ExcelHelperLib
         /// <param name="top">数据列起始行 从0开始</param>
         /// <param name="clomindex">列号 从0开始</param>
         /// <param name="objlist">插入单元格的数据列表 MemoryStream图片数据流</param>
-        public CellColm(int top, int clomindex, List<MemoryStream> Pic_List)
+        public CellColm(int top, int clomindex, IList<MemoryStream> Pic_List)
         {
             this.TopIndex = top;
-            this.ButtomIndex = top + Pic_List.Count - 1;
+            this.ButtomIndex = top + Pic_List.Count() - 1;
             this.ColmIndex = clomindex;
             this.Pic_List = Pic_List;
             Is_Pic = true;

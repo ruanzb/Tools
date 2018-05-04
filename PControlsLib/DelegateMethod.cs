@@ -166,6 +166,37 @@ namespace PControlsLib
 
             }
         } 
+
+        /// <summary>
+        /// 更新进度条
+        /// </summary>
+        /// <param name="processbar"></param>
+        /// <param name="index"></param>
+        /// <param name="length"></param>
+        public static void UpdateProcessBar(ProgressBar progressbar,int index,int length)
+        {
+            if (progressbar.InvokeRequired)
+            {
+                Action<int,int> method = delegate (int Index,int Length)
+                {
+                    progressbar.Maximum = Length;
+                    progressbar.Value = Index;
+                };
+                try
+                {
+                    progressbar.Invoke(method, index, length);
+                }
+                catch
+                {
+
+                }
+            }
+            else
+            {
+                progressbar.Maximum = index;
+                progressbar.Value = length;
+            }
+        }
         #endregion
     }
 }

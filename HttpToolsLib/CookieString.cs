@@ -69,20 +69,29 @@ namespace HttpToolsLib
         /// <returns></returns>
         private List<SingleCookie> CreatCookieList(string Cookie)
         {
+            List<String> StringArray = new List<string>();
+            var arr1 = Cookie.Split(';');
+            if(arr1.Length>0)
+            {
+                foreach(var cookieline in arr1)
+                {
+                    var arr2 = cookieline.Split(',');
+                    if(arr2.Length>0)
+                    {
+                        foreach(var scookie in arr2)
+                        {
+                            var arr3 = scookie.Split('=');
+                            if(arr3.Length == 2&& !arr3[0].ToLower().Contains("httponly") && !arr3[0].ToLower().Contains("path") && !arr3[0].ToLower().Contains("expires") && !arr3[0].ToLower().Contains("domain"))
+                            {
+                                StringArray.Add(scookie);
+                            }
+                        }
+                    }
+                }
+            }
             List<SingleCookie> Cookielist = new List<SingleCookie>();
             try
             {
-                //去除 cookie字符串中的httponly path expires
-                Regex httponlyreg = new Regex("httponly(,|/)*", RegexOptions.IgnoreCase);
-                Regex pathreg = new Regex("path=/(,|/)*", RegexOptions.IgnoreCase);
-                Regex expiresreg = new Regex("expires(,|/)*", RegexOptions.IgnoreCase);
-
-                Cookie = httponlyreg.Replace(Cookie, String.Empty);
-                Cookie = pathreg.Replace(Cookie, String.Empty);
-                Cookie = expiresreg.Replace(Cookie, String.Empty);
-                Cookie = Cookie.Replace(" ", String.Empty);
-                //以;为界分割
-                String[] StringArray = Cookie.Split(';');
                 String[] SingleArray;
                 StringArray.ToList().ForEach(singlecookiestr=> {
                     //以=为界分割
@@ -99,10 +108,6 @@ namespace HttpToolsLib
                         Cookielist.Add(sc);
                     }
                 });
-                //Parallel.ForEach(StringArray, singlecookiestr =>
-                //{
-      
-                //});
             }
             catch
             {
@@ -153,6 +158,12 @@ namespace HttpToolsLib
                 }
             }
         }
+
+        public String GetCookie(String key)
+        {
+            return (CookieList == null || CookieList.Count == 0) ? String.Empty : CookieList.FirstOrDefault(c=>c.Name.Equals(key)).Value;
+        }
+
         /// <summary>
         /// 转化CookieString对象为字符串
         /// </summary>

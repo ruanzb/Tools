@@ -5,3 +5,10 @@ F:\GITS\Tools\ExtractLib\bin\x64\Debug\ExtractLib.pdb
 F:\GITS\Tools\ExtractLib\bin\x64\Debug\HtmlAgilityPack.dll
 F:\GITS\Tools\ExtractLib\obj\x64\Debug\ExtractLib.dll
 F:\GITS\Tools\ExtractLib\obj\x64\Debug\ExtractLib.pdb
+H:\GITS\Tools\ExtractLib\bin\x64\Debug\ExtractLib.dll
+H:\GITS\Tools\ExtractLib\bin\x64\Debug\ExtractLib.pdb
+H:\GITS\Tools\ExtractLib\bin\x64\Debug\HtmlAgilityPack.dll
+H:\GITS\Tools\ExtractLib\obj\x64\Debug\ExtractLib.csproj.CoreCompileInputs.cache
+H:\GITS\Tools\ExtractLib\obj\x64\Debug\ExtractLib.csproj.CopyComplete
+H:\GITS\Tools\ExtractLib\obj\x64\Debug\ExtractLib.dll
+H:\GITS\Tools\ExtractLib\obj\x64\Debug\ExtractLib.pdb

@@ -1,0 +1,6 @@
+H:\GITS\Tools\PControlsLib\bin\x86\Debug\PControlsLib.dll
+H:\GITS\Tools\PControlsLib\bin\x86\Debug\PControlsLib.pdb
+H:\GITS\Tools\PControlsLib\obj\x86\Debug\PControlsLib.csprojResolveAssemblyReference.cache
+H:\GITS\Tools\PControlsLib\obj\x86\Debug\PControlsLib.csproj.CoreCompileInputs.cache
+H:\GITS\Tools\PControlsLib\obj\x86\Debug\PControlsLib.dll
+H:\GITS\Tools\PControlsLib\obj\x86\Debug\PControlsLib.pdb

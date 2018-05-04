@@ -9,17 +9,16 @@
 
 #region 名空间
 using System;
+using System.Collections.Concurrent;
 using System.Drawing;
 using System.IO;
+using System.IO.Compression;
+using System.Linq;
 using System.Net;
+using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
-using System.IO.Compression;
 using System.Web;
-using System.Collections.Concurrent;
-using System.Threading;
-using System.Threading.Tasks;
-using Newtonsoft.Json;
 #endregion
 
 namespace HttpToolsLib
@@ -29,6 +28,19 @@ namespace HttpToolsLib
     /// </summary>
     public class HttpMethod
     {
+        #region 委托和事件声明
+        /// <summary>
+        //异步请求结束 委托
+        /// </summary>
+        /// <param name="html"></param>
+        public delegate void EndResopnseHandle(String html,object []args);
+        /// <summary>
+        /// 异步请求结束事件
+        /// </summary>
+        public static event EndResopnseHandle EndResopnseMethod;
+
+        #endregion
+
         #region URL编解码
         /// <summary>
         /// URL编码
@@ -185,13 +197,6 @@ namespace HttpToolsLib
                             }
                         }
                         catch { }
-                        finally
-                        {
-                            so.Dispose();
-                            so.Close();
-                            st.Dispose();
-                            st.Close();
-                        }
                         #endregion
                     }
                 }
@@ -242,13 +247,6 @@ namespace HttpToolsLib
                             }
                         }
                         catch { }
-                        finally
-                        {
-                            so.Dispose();
-                            so.Close();
-                            st.Dispose();
-                            st.Close();
-                        }
                         #endregion
                     }
                 }
@@ -434,7 +432,7 @@ namespace HttpToolsLib
                 request = Httpinfo.CreatRequest();
                 if (request != null)
                 {
-                    if (Httpinfo.UseTaskTimeOut && !String.IsNullOrEmpty(Httpinfo.Ip))
+                    if (Httpinfo.UseTaskTimeOut)
                     {
 
                         var a = request.BeginGetResponse(null, null);
@@ -446,6 +444,7 @@ namespace HttpToolsLib
                         else
                         {
                             response = null;
+                            a = null;
                         }
                     }
                     else
@@ -459,25 +458,37 @@ namespace HttpToolsLib
                     }
                     else
                     {
-                        //GZIIP处理
-                        if (response.ContentEncoding != null && response.ContentEncoding.ToLower().Contains("gzip"))
+                        try
+                        {
+                            //GZIIP处理
+                            if (response.ContentEncoding != null && response.ContentEncoding.ToLower().Contains("gzip"))
+                            {
+                                //开始读取流并设置编码方式
+                               var a =  new GZipStream(response.GetResponseStream(), CompressionMode.Decompress);
+                                a.CopyTo(_stream, 10240);
+                                a.Close();
+                                a.Dispose();
+                                a = null;
+                                //.net4.0以下写法
+                                //_stream = GetMemoryStream(new GZipStream(response.GetResponseStream(), CompressionMode.Decompress));
+                            }
+                            else
+                            {
+                                //开始读取流并设置编码方式
+                                response.GetResponseStream().CopyTo(_stream, 10240);
+                                //.net4.0以下写法
+                                //_stream = GetMemoryStream(response.GetResponseStream());
+                            }
+                        }
+                        catch 
                         {
 
-                            //开始读取流并设置编码方式
-                            //new GZipStream(response.GetResponseStream(), CompressionMode.Decompress).CopyTo(_stream, 10240);
-                            //.net4.0以下写法
-                            _stream = GetMemoryStream(new GZipStream(response.GetResponseStream(), CompressionMode.Decompress));
                         }
-                        else
-                        {
-                            //开始读取流并设置编码方式
-                            //response.GetResponseStream().CopyTo(_stream, 10240);
-                            //.net4.0以下写法
-                            _stream = GetMemoryStream(response.GetResponseStream());
-                        }
+                 
                         //获取Byte
                         byte[] RawResponse = _stream.ToArray();
-                        _stream.Close();
+
+                    
                         if (Httpinfo.Encoding != null)
                         {
                             encoding = Httpinfo.Encoding;
@@ -488,8 +499,10 @@ namespace HttpToolsLib
                             Match meta = Regex.Match(Encoding.Default.GetString(RawResponse), "<meta([^<]*)charset=([^<]*)[\"']", RegexOptions.IgnoreCase);
                             string charter = (meta.Groups.Count > 1) ? meta.Groups[2].Value.ToLower() : string.Empty;
                             charter = charter.Replace("\"", "").Replace("'", "").Replace(";", "").Replace("iso-8859-1", "gbk");
-                            if (charter.Length > 2)
-                                encoding = Encoding.GetEncoding(charter.Trim());
+                            if (charter.Equals("gbk")|| charter.Equals("gb2312")|| charter.Equals("utf-8"))
+                            {
+                                    encoding = Encoding.GetEncoding(charter.Trim());
+                            }
                             else
                             {
                                 if (string.IsNullOrEmpty(response.CharacterSet))
@@ -510,6 +523,9 @@ namespace HttpToolsLib
                                 else
                                     encoding = Encoding.GetEncoding(response.CharacterSet);
                             }
+
+                            meta = null;
+                            charter = null;
                         }
                         //得到返回的HTML
                         retString = encoding.GetString(RawResponse);
@@ -521,15 +537,37 @@ namespace HttpToolsLib
             {
                 if (Httpinfo.IgnoreWebException)
                 {
-                    response = (HttpWebResponse)e.Response;
-                    using (StreamReader sr = new StreamReader(response.GetResponseStream(), encoding))
+                    try
                     {
-                        retString = sr.ReadToEnd();
+                        response = (HttpWebResponse)e.Response;
+                        //GZIIP处理
+                        if (response.ContentEncoding != null && response.ContentEncoding.Equals("gzip", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            //开始读取流并设置编码方式
+                            //new GZipStream(response.GetResponseStream(), CompressionMode.Decompress).CopyTo(_stream, 10240);
+                            //.net4.0以下写法
+                            _stream = GetMemoryStream(new GZipStream(response.GetResponseStream(), CompressionMode.Decompress));
+                        }
+                        else
+                        {
+                            //开始读取流并设置编码方式
+                            //response.GetResponseStream().CopyTo(_stream, 10240);
+                            //.net4.0以下写法
+                            _stream = GetMemoryStream(response.GetResponseStream());
+                        }
+                        //获取Byte
+                        byte[] RawResponse = _stream.ToArray();
+                        retString = encoding.GetString(RawResponse);
+                        RawResponse = null;
                     }
-                }
-                else
-                {
-                    return e.Message;
+                    catch
+                    {
+
+                    }
+                    finally
+                    {
+                        retString = String.IsNullOrEmpty(retString) ? e.Message : retString;
+                    }
                 }
             }
             finally
@@ -544,7 +582,7 @@ namespace HttpToolsLib
                     response.Close();
                     response = null;
                 }
-                if (_stream != null)
+                if(_stream != null)
                 {
                     _stream.Close();
                     _stream.Dispose();
@@ -575,7 +613,7 @@ namespace HttpToolsLib
             {
                 if (request != null)
                 {
-                    if (Httpinfo.UseTaskTimeOut && !String.IsNullOrEmpty(Httpinfo.Ip))
+                    if (Httpinfo.UseTaskTimeOut)
                     {
 
                         var a = request.BeginGetResponse(null, null);
@@ -678,11 +716,32 @@ namespace HttpToolsLib
             {
                 if(Httpinfo.IgnoreWebException)
                 {
-                    response = (HttpWebResponse)e.Response;
-                    Httpinfo.Cookie.AddCookie(response.Headers[HttpResponseHeader.SetCookie]);
-                    using (StreamReader sr = new StreamReader(response.GetResponseStream(), encoding))
+                    try
                     {
-                        retString = sr.ReadToEnd();
+                        response = (HttpWebResponse)e.Response;
+                        Httpinfo.Cookie.AddCookie(response.Headers[HttpResponseHeader.SetCookie]);
+                        //GZIIP处理
+                        if (response.ContentEncoding != null && response.ContentEncoding.Equals("gzip", StringComparison.InvariantCultureIgnoreCase))
+                        {
+                            //开始读取流并设置编码方式
+                            //new GZipStream(response.GetResponseStream(), CompressionMode.Decompress).CopyTo(_stream, 10240);
+                            //.net4.0以下写法
+                            _stream = GetMemoryStream(new GZipStream(response.GetResponseStream(), CompressionMode.Decompress));
+                        }
+                        else
+                        {
+                            //开始读取流并设置编码方式
+                            //response.GetResponseStream().CopyTo(_stream, 10240);
+                            //.net4.0以下写法
+                            _stream = GetMemoryStream(response.GetResponseStream());
+                        }
+                        //获取Byte
+                        byte[] RawResponse = _stream.ToArray();
+                        retString = encoding.GetString(RawResponse);
+                    }
+                    catch 
+                    {
+
                     }
                 }
                 else
@@ -699,17 +758,153 @@ namespace HttpToolsLib
                 }
                 if (response != null)
                 {
+                    Httpinfo.Location =Convert.ToString(response.Headers["Location"]);
                     response.Close();
                     response = null;
                 }
-                if (_stream != null)
+            }
+            return retString??String.Empty;
+        }
+
+        /// <summary>
+        /// 封装的参数化Http请求 异步  调用时请向 HttpMethod.EndResopnseMethod事件 注册获得响应后需要执行的方法
+        /// </summary>
+        /// <param name="httpInfo"></param>
+        /// <returns></returns>
+        public static String HttpWork_Async(HttpInfo Httpinfo, object[] args)
+        {
+            //待返回的网页源代码
+            String retString = String.Empty;
+            HttpWebRequest request = null;
+            try
+            {
+                request = Httpinfo.CreatRequest();
+                if (request != null)
                 {
-                    _stream.Close();
-                    _stream.Dispose();
-                    _stream = null;
+                    HttpInfo info = (HttpInfo)DeepCopy(Httpinfo);
+                    args[1] = info;
+                    object[] oj = { request,DateTime.Now };
+                    object[] foj = new object[oj.Length + args.Length];
+                    oj.CopyTo(foj,0);
+                    args.CopyTo(foj, oj.Length);
+
+                    request.BeginGetResponse(EndResopnseCallBack, foj);
+
+                    foj = null;
+                    oj = null;
+                    args = null;
                 }
             }
+            catch 
+            {
+            }
             return retString;
+        }
+
+        /// <summary>
+        /// Response异步回调函数
+        /// </summary>
+        /// <param name="ar"></param>
+        private static void EndResopnseCallBack(IAsyncResult ar)
+        {
+            //解析获得响应内容
+            object[] ojarr = (object[])ar.AsyncState;
+            var request = ojarr[0] as HttpWebRequest;
+            HttpInfo Httpinfo = ojarr[3] as HttpInfo;
+            MemoryStream _stream = null;
+            Encoding encoding = Encoding.UTF8;
+            String html = String.Empty;
+            HttpWebResponse response = null;
+            try
+            {
+                using (response = request.EndGetResponse(ar) as HttpWebResponse)
+                {
+                    if (ExecDateDiff(DateTime.Now, Convert.ToDateTime(ojarr[1])) <= Httpinfo.Timeout)
+                    {
+                        //GZIIP处理
+                        if (response.ContentEncoding != null && response.ContentEncoding.ToLower().Contains("gzip"))
+                        {
+
+                            //开始读取流并设置编码方式
+                            //new GZipStream(response.GetResponseStream(), CompressionMode.Decompress).CopyTo(_stream, 10240);
+                            //.net4.0以下写法
+                            _stream = GetMemoryStream(new GZipStream(response.GetResponseStream(), CompressionMode.Decompress));
+                        }
+                        else
+                        {
+                            //开始读取流并设置编码方式
+                            //response.GetResponseStream().CopyTo(_stream, 10240);
+                            //.net4.0以下写法
+                            _stream = GetMemoryStream(response.GetResponseStream());
+                        }
+                        //获取Byte
+                        byte[] RawResponse = _stream.ToArray();
+                        _stream.Close();
+                        if (Httpinfo.Encoding != null)
+                        {
+                            encoding = Httpinfo.Encoding;
+                        }
+                        else
+                        {
+                            //从这里开始我们要无视编码了
+                            Match meta = Regex.Match(Encoding.Default.GetString(RawResponse), "<meta([^<]*)charset=([^<]*)[\"']", RegexOptions.IgnoreCase);
+                            string charter = (meta.Groups.Count > 1) ? meta.Groups[2].Value.ToLower() : string.Empty;
+                            charter = charter.Replace("\"", "").Replace("'", "").Replace(";", "").Replace("iso-8859-1", "gbk");
+                            if (charter.Length > 2)
+                                encoding = Encoding.GetEncoding(charter.Trim());
+                            else
+                            {
+                                if (string.IsNullOrEmpty(response.CharacterSet))
+                                {
+                                    try
+                                    {
+                                        encoding = Encoding.GetEncoding(charter.Trim());
+                                    }
+                                    catch
+                                    {
+                                        encoding = Encoding.UTF8;
+                                    }
+                                }
+                                else if (response.CharacterSet.ToLower().Contains("iso-8859-1"))
+                                {
+                                    encoding = Encoding.UTF8;
+                                }
+                                else
+                                    encoding = Encoding.GetEncoding(response.CharacterSet);
+                            }
+                        }
+                        //得到返回的HTML
+                        html = encoding.GetString(RawResponse);
+                    }
+                }
+            }
+            catch (System.Net.WebException e)
+            {
+                if (Httpinfo.IgnoreWebException)
+                {
+                    response = (HttpWebResponse)e.Response;
+                    using (StreamReader sr = new StreamReader(response.GetResponseStream(), encoding))
+                    {
+                        html = sr.ReadToEnd();
+                    }
+                }
+                else
+                {
+                    html = e.Message;
+                }
+            }
+            finally
+            {
+
+                var list = ojarr.ToList().GetRange(2, ojarr.Length - 2);
+
+                if (request != null)
+                {
+                    request.Abort();
+                    request = null;
+                }
+                EndResopnseMethod(html, list.ToArray());
+            }
         }
         #endregion
 
@@ -857,6 +1052,15 @@ namespace HttpToolsLib
             return html.Contains(Ips);
         }
 
+
+        public static bool CheckNetwork()
+        {
+            String html = HttpMethod.FastGetMethod("https://www.baidu.com/s?ie=utf-8&mod=1&isbd=1&isid=&ie=utf-8&f=8&rsv_bp=1&rsv_idx=1&tn=baidu&wd=ip&oq=ip&rsv_pq=&rsv_t==cn&rsv_enter=0&bs=ip&rsv_sid=undefined&_ss=1&clist=&hsug=&f4s=1&csor=0&_cr1=22779");
+            //String html = HttpMethod.FastGetMethod("http://2017.ip138.com/ic.asp");
+            Regex reg = new Regex(@"\d{1,3}.\d{1,3}.\d{1,3}.\d{1,3}");
+            return reg.IsMatch(html);
+        }
+
         #endregion
 
         #region 快速请求
@@ -879,6 +1083,7 @@ namespace HttpToolsLib
             item.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
             item.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8";
             item.URL = Url;
+            item.Encoding = Encoding.GetEncoding("utf-8");
             if (!String.IsNullOrEmpty(ip))
             {
                 item.ProxyIp = ip;
@@ -962,13 +1167,11 @@ namespace HttpToolsLib
             HttpHelper helper = new HttpHelper();
             HttpItem item = new HttpItem();
             HttpResult result = new HttpResult();
+            String html = String.Empty;
             item.Method = "Post";
             item.UserAgent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/59.0.3071.115 Safari/537.36";
-            //item.UserAgent = new UAPool().GetRandomUA();
             item.URL = Url;
-            // item.Encoding = Encoding.GetEncoding("utf-8");
             item.Referer = Refrer;
-            //item.Accept = "application/json, text/javascript, */*; q=0.01";
             item.ContentType = "application/x-www-form-urlencoded; charset=UTF-8";
             item.Cookie = Cookie;
             item.Postdata = Postdata;
@@ -985,8 +1188,10 @@ namespace HttpToolsLib
                 //  item.Ip = ip;
             }
             // info.Referer = String.Empty;
-            result = helper.GetHtml(item);
-            return result.Html;
+            html = helper.GetHtml(item).Html;
+            helper = null;
+            item = null;
+            return html;
         }
         /// <summary>
         /// 返回状态码
@@ -1059,6 +1264,39 @@ namespace HttpToolsLib
             {
                 return reurl;
             }
+        }
+        #endregion
+
+        #region 辅助函数
+
+     
+        /// <summary>
+        /// 程序执行时间测试
+        /// </summary>
+        /// <param name="dateBegin">开始时间</param>
+        /// <param name="dateEnd">结束时间</param>
+        /// <returns>返回(秒)单位，比如: 0.00239秒</returns>
+        public static double ExecDateDiff(DateTime dateBegin, DateTime dateEnd)
+        {
+            TimeSpan ts1 = new TimeSpan(dateBegin.Ticks);
+            TimeSpan ts2 = new TimeSpan(dateEnd.Ticks);
+            TimeSpan ts3 = ts1.Subtract(ts2).Duration();
+            //你想转的格式
+            return ts3.TotalMilliseconds;
+        }
+        /* 利用反射实现深拷贝
+*/
+        public static object DeepCopy(object _object)
+        {
+            Type T = _object.GetType();
+            object o = Activator.CreateInstance(T);
+            PropertyInfo[] PI = T.GetProperties();
+            for (int i = 0; i < PI.Length; i++)
+            {
+                PropertyInfo P = PI[i];
+                P.SetValue(o, P.GetValue(_object, null), null);
+            }
+            return o;
         }
         #endregion
     }

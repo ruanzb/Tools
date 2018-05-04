@@ -3,3 +3,12 @@ F:\GITS\Tools\HttpToolsLib\bin\x64\Debug\HttpToolsLib.pdb
 F:\GITS\Tools\HttpToolsLib\obj\x64\Debug\HttpToolsLib.csproj.CoreCompileInputs.cache
 F:\GITS\Tools\HttpToolsLib\obj\x64\Debug\HttpToolsLib.dll
 F:\GITS\Tools\HttpToolsLib\obj\x64\Debug\HttpToolsLib.pdb
+H:\GITS\Tools\HttpToolsLib\bin\x64\Debug\HttpToolsLib.dll
+H:\GITS\Tools\HttpToolsLib\bin\x64\Debug\HttpToolsLib.pdb
+H:\GITS\Tools\HttpToolsLib\bin\x64\Debug\DotRas.dll
+H:\GITS\Tools\HttpToolsLib\bin\x64\Debug\Newtonsoft.Json.dll
+H:\GITS\Tools\HttpToolsLib\bin\x64\Debug\DotRas.xml
+H:\GITS\Tools\HttpToolsLib\obj\x64\Debug\HttpToolsLib.csproj.CoreCompileInputs.cache
+H:\GITS\Tools\HttpToolsLib\obj\x64\Debug\HttpToolsLib.csproj.CopyComplete
+H:\GITS\Tools\HttpToolsLib\obj\x64\Debug\HttpToolsLib.dll
+H:\GITS\Tools\HttpToolsLib\obj\x64\Debug\HttpToolsLib.pdb

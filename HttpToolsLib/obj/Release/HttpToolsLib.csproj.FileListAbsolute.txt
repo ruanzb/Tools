@@ -35,3 +35,15 @@ F:\GITS\Tools\HttpToolsLib\obj\Release\HttpToolsLib.pdb
 F:\GITS\Tools\HttpToolsLib\obj\Release\HttpToolsLib.csproj.CoreCompileInputs.cache
 F:\GITS\Tools\HttpToolsLib\obj\Release\HttpToolsLib.csprojResolveAssemblyReference.cache
 F:\GITS\Tools\HttpToolsLib\bin\Release\Newtonsoft.Json.dll
+F:\GITS\Tools\HttpToolsLib\bin\Release\DotRas.dll
+F:\GITS\Tools\HttpToolsLib\bin\Release\DotRas.xml
+H:\GITS\Tools\HttpToolsLib\bin\Release\HttpToolsLib.dll
+H:\GITS\Tools\HttpToolsLib\bin\Release\HttpToolsLib.pdb
+H:\GITS\Tools\HttpToolsLib\bin\Release\DotRas.dll
+H:\GITS\Tools\HttpToolsLib\bin\Release\Newtonsoft.Json.dll
+H:\GITS\Tools\HttpToolsLib\bin\Release\DotRas.xml
+H:\GITS\Tools\HttpToolsLib\obj\Release\HttpToolsLib.csprojResolveAssemblyReference.cache
+H:\GITS\Tools\HttpToolsLib\obj\Release\HttpToolsLib.csproj.CoreCompileInputs.cache
+H:\GITS\Tools\HttpToolsLib\obj\Release\HttpToolsLib.csproj.CopyComplete
+H:\GITS\Tools\HttpToolsLib\obj\Release\HttpToolsLib.dll
+H:\GITS\Tools\HttpToolsLib\obj\Release\HttpToolsLib.pdb

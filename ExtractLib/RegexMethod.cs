@@ -21,7 +21,7 @@ namespace ExtractLib
     public class RegexMethod
     {
         #region 方法
-		// <summary>
+        // <summary>
         /// 抽取单条
         /// </summary>
         /// <param name="Regstr">正则表达式字符串</param>
@@ -49,8 +49,10 @@ namespace ExtractLib
                 {
                     return String.Empty;
                 }
-                return reg.Match(Txt).Value;
-        
+                retStr = reg.Match(Txt).Value;
+
+                reg = null;
+                match = null;
             }
             return retStr;
         }
@@ -62,29 +64,36 @@ namespace ExtractLib
         /// <param name="Layer">抽取层数</param>
         /// <param name="MatchCheck">是否检查匹配</param>
         /// <returns></returns>
-        public static String GetSingleResult(String Regstr, String Txt, int Layer,bool MatchCheck = false)
+        public static String GetSingleResult(String Regstr, String Txt, int Layer, bool MatchCheck = false)
         {
             String retStr = String.Empty;
-            if(String.IsNullOrEmpty(Txt))
-            {
-                return String.Empty;
-            }
-            if (!String.IsNullOrEmpty(Regstr))
+            if (!String.IsNullOrEmpty(Txt) && !String.IsNullOrEmpty(Regstr))
             {
                 Regex reg = new Regex(Regstr);
-                if(MatchCheck)
+                try
                 {
-                    if (reg.IsMatch(Txt))
+                    if (MatchCheck)
                     {
-                        return String.Empty;
+                        if (reg.IsMatch(Txt))
+                        {
+                            return String.Empty;
+                        }
+                    }
+                    retStr = reg.Match(Txt).Groups[Layer].Value;
+                    if (!String.IsNullOrEmpty(retStr))
+                    {
+                        retStr = retStr.Trim();
                     }
                 }
-                retStr = reg.Match(Txt).Groups[Layer].Value;
-                if (!String.IsNullOrEmpty(retStr))
+                catch
                 {
-                    retStr = retStr.Trim();
+                    retStr = String.Empty;
                 }
-                reg = null;
+                finally
+                {
+                    reg = null;
+                }
+
             }
             return retStr;
         }
@@ -98,15 +107,15 @@ namespace ExtractLib
         /// <returns></returns>
         public static List<String> GetMutResult(String Regstr, String Txt, RegexOptions regop = RegexOptions.None, bool MatchCheck = false)
         {
-            if(String.IsNullOrEmpty(Txt))
+            if (String.IsNullOrEmpty(Txt))
             {
                 return null;
             }
             List<String> RetList = new List<string>();
             if (!String.IsNullOrEmpty(Regstr))
             {
-                Regex reg = new Regex(Regstr,regop);
-                if(MatchCheck)
+                Regex reg = new Regex(Regstr, regop);
+                if (MatchCheck)
                 {
                     if (reg.IsMatch(Txt))
                     {
@@ -114,13 +123,16 @@ namespace ExtractLib
                     }
                 }
                 MatchCollection mc = reg.Matches(Txt);
-                if(mc!=null)
+                if (mc != null)
                 {
                     foreach (Match m in mc)
                     {
                         RetList.Add(m.Value);
                     }
                 }
+
+                reg = null;
+                mc = null;
             }
             return RetList;
         }
@@ -132,9 +144,9 @@ namespace ExtractLib
         /// <param name="Layer">抽取层数</param>
         /// <param name="MatchCheck">是否检查匹配</param>
         /// <returns></returns>
-        public static List<String> GetMutResult(String Regstr, String Txt, int Layer,bool MatchCheck = false)
+        public static List<String> GetMutResult(String Regstr, String Txt, int Layer, bool MatchCheck = false)
         {
-            if(String.IsNullOrEmpty(Txt))
+            if (String.IsNullOrEmpty(Txt))
             {
                 return null;
             }
@@ -184,7 +196,7 @@ namespace ExtractLib
         /// <returns></returns>
         public static bool CheckRegex(String Regstr, String Txt)
         {
-            if(String.IsNullOrEmpty(Txt))
+            if (String.IsNullOrEmpty(Txt))
             {
                 return false;
             }
@@ -197,7 +209,7 @@ namespace ExtractLib
         /// <param name="Regstr">字符串类型的正则表达式</param>
         /// <param name="Txt">待分割的文本</param>
         /// <returns></returns>
-        public static String[] RegSplit(String Regstr,String Txt)
+        public static String[] RegSplit(String Regstr, String Txt)
         {
             if (String.IsNullOrEmpty(Txt))
             {
@@ -214,13 +226,13 @@ namespace ExtractLib
         /// <returns></returns>
         public static String GetNum<T>(T p)
         {
-            String str = RegexMethod.GetSingleResult("[0-9]+",Convert.ToString(p));
-            if(String.IsNullOrEmpty(str))
+            String str = RegexMethod.GetSingleResult("[0-9]+", Convert.ToString(p));
+            if (String.IsNullOrEmpty(str))
             {
                 return String.Empty;
             }
             return str;
-        } 
-	#endregion
+        }
+        #endregion
     }
 }

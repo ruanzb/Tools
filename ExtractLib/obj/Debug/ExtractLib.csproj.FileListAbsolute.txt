@@ -43,3 +43,10 @@ F:\GITS\Tools\ExtractLib\obj\Debug\ExtractLib.csproj.CoreCompileInputs.cache
 F:\GITS\Tools\ExtractLib\obj\Debug\ExtractLib.dll
 F:\GITS\Tools\ExtractLib\obj\Debug\ExtractLib.pdb
 F:\GITS\Tools\ExtractLib\obj\Debug\ExtractLib.csprojResolveAssemblyReference.cache
+H:\GITS\Tools\ExtractLib\bin\Debug\ExtractLib.dll
+H:\GITS\Tools\ExtractLib\bin\Debug\ExtractLib.pdb
+H:\GITS\Tools\ExtractLib\bin\Debug\HtmlAgilityPack.dll
+H:\GITS\Tools\ExtractLib\obj\Debug\ExtractLib.csproj.CoreCompileInputs.cache
+H:\GITS\Tools\ExtractLib\obj\Debug\ExtractLib.csproj.CopyComplete
+H:\GITS\Tools\ExtractLib\obj\Debug\ExtractLib.dll
+H:\GITS\Tools\ExtractLib\obj\Debug\ExtractLib.pdb

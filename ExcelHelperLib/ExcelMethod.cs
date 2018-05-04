@@ -229,7 +229,7 @@ namespace ExcelHelperLib
         /// <param name="Save">是否自动保存</param>
         /// <param name="book">Workbook对象</param>
         /// <returns></returns>
-        public static void InsertData(ExcelFormat EFormat, bool Save = false, Workbook book = null)
+        public static void InsertData(ExcelFormat EFormat, bool Save = true, Workbook book = null)
         {
             if (book == null)
             {

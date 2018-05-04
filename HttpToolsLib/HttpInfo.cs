@@ -11,6 +11,8 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 #endregion
@@ -21,7 +23,7 @@ namespace HttpToolsLib
     /// <summary>
     /// Htt版本类型枚举
     /// </summary>
-    public enum ProtocolVersionEnum { V10=10,V11};
+    public enum ProtocolVersionEnum { V10 = 10, V11 };
 
     /// <summary>
     /// 构造Http请求头
@@ -57,7 +59,9 @@ namespace HttpToolsLib
         #endregion
 
         #region 属性
- 
+
+        static
+
         String _UrlReg = @"((http|ftp|https)://)(([a-zA-Z0-9\._-]+\.[a-zA-Z]{2,6})|([0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}))(:[0-9]{1,4})*(/[a-zA-Z0-9\&%_\./-~-]*)?";
         /// <summary>
         /// 用于校验请求Url的正则表达式
@@ -123,7 +127,7 @@ namespace HttpToolsLib
             set { _Referer = value; }
         }
 
-  
+
         String _PostData = string.Empty;
         /// <summary>
         /// Post数据
@@ -143,7 +147,7 @@ namespace HttpToolsLib
             get { return _RequestUrl; }
             set { _RequestUrl = value; }
         }
- 
+
         String _Ip = String.Empty;
         /// <summary>
         /// 代理ip 默认为空
@@ -153,7 +157,7 @@ namespace HttpToolsLib
             get { return _Ip; }
             set { _Ip = value; }
         }
- 
+
         private bool _AllowAutoRedirect = false;
         /// <summary>
         /// 是否允许重定向 默认为false
@@ -163,7 +167,7 @@ namespace HttpToolsLib
             get { return _AllowAutoRedirect; }
             set { _AllowAutoRedirect = value; }
         }
- 
+
         private bool _Expect100Continue = false;
         /// <summary>
         /// 100Continue行为 默认为false
@@ -193,7 +197,7 @@ namespace HttpToolsLib
             get { return _Accept; }
             set { _Accept = value; }
         }
- 
+
         private long _ContentLength = 0;
         /// <summary>
         /// 传输长度 自动设定 
@@ -224,7 +228,7 @@ namespace HttpToolsLib
             set { _ReadWriteTimeout = value; }
         }
 
-   
+
         private String _AcceptEncoding = "gzip,deflate";
         /// <summary>
         /// 可接受的压缩方式 默认为gzip,deflate
@@ -245,27 +249,20 @@ namespace HttpToolsLib
             set { _AllowWriteStreamBuffering = value; }
         }
 
-        private int _ConnectionLimit = short.MaxValue;
-        /// <summary>
-        /// 最大连接数 默认为 short.MaxValue
-        /// </summary>
-        public int ConnectionLimit
-        {
-            get { return _ConnectionLimit; }
-            set { _ConnectionLimit = value; }
-        }
- 
+
+
+
         private bool _KeepLive = false;
         /// <summary>
-        /// 是否保持连接 默认为true
+        /// 是否保持连接 默认为false
         /// </summary>
         public bool KeepLive
         {
             get { return _KeepLive; }
             set { _KeepLive = value; }
         }
-  
-        private ProtocolVersionEnum _ProtocolVersion =  ProtocolVersionEnum.V11;
+
+        private ProtocolVersionEnum _ProtocolVersion = ProtocolVersionEnum.V11;
         /// <summary>
         /// Http版本类型 默认为HttpVersion.Version10
         /// </summary>
@@ -362,8 +359,33 @@ namespace HttpToolsLib
             get { return _IgnoreWebException; }
             set { _IgnoreWebException = value; }
         }
-        
-        bool _IgnoreWebException = false;
+
+        /// <summary>
+        /// 是否在没有代理IP时使用系统代理
+        /// </summary>
+        public bool UseSystemProxy { get => _UseSystemProxy; set => _UseSystemProxy = value; }
+        public static int ConnectionLimit { get => _ConnectionLimit; set => _ConnectionLimit = value; }
+        public static bool RemoteCertificateValidateEnable { get => _RemoteCertificateValidateEnable; set => _RemoteCertificateValidateEnable = value; }
+        /// <summary>
+        /// 重定向地址
+        /// </summary>
+        public string Location { get; internal set; }
+
+        bool _IgnoreWebException = true;
+
+
+        bool _UseSystemProxy = false;
+        #endregion
+
+        #region 静态属性
+        /// <summary>
+        /// 最大连接数 默认为 short.MaxValue
+        /// </summary>
+        static int _ConnectionLimit = short.MaxValue;
+        /// <summary>
+        /// 证书校验
+        /// </summary>
+        static bool _RemoteCertificateValidateEnable = false;
         #endregion
 
         #region 构造请求
@@ -390,7 +412,7 @@ namespace HttpToolsLib
                     return null;
                 }
                 #endregion
-                
+
                 #region 请求头参数配置
                 //强制转化为HttpWebRequest
                 var Request = webRequest as HttpWebRequest;
@@ -412,11 +434,15 @@ namespace HttpToolsLib
                 Request.UserAgent = User_Agent;
                 //设置最大连接数
                 Request.ServicePoint.ConnectionLimit = ConnectionLimit;
-                System.Net.ServicePointManager.DefaultConnectionLimit = ConnectionLimit;
+                System.Net.ServicePointManager.DefaultConnectionLimit = HttpInfo.ConnectionLimit;
+                if (!RemoteCertificateValidateEnable && ServicePointManager.ServerCertificateValidationCallback == null)
+                {
+                    ServicePointManager.ServerCertificateValidationCallback += RemoteCertificateValidate;
+                }
                 //设置KeepAlive
                 Request.KeepAlive = KeepLive;
                 //设置HttpVersion
-                Request.ProtocolVersion = ProtocolVersion ==  ProtocolVersionEnum.V10 ?HttpVersion.Version10:HttpVersion.Version11;
+                Request.ProtocolVersion = ProtocolVersion == ProtocolVersionEnum.V10 ? HttpVersion.Version10 : HttpVersion.Version11;
                 //设置UseNagleAlgorithm
                 Request.ServicePoint.UseNagleAlgorithm = UseNagleAlgorithm;
 
@@ -463,7 +489,10 @@ namespace HttpToolsLib
                     String ip = Ip;
                     try
                     {
-                        Request.Proxy = new WebProxy(ip.Split(':')[0], Convert.ToInt32(ip.Split(':')[1]));
+                        var arr = ip.Split(':');
+                        var port = Convert.ToInt32(arr[arr.Length - 1]);
+                        var address = ip.Replace(":" + port, String.Empty);
+                        Request.Proxy = new WebProxy(address, port);
                         if (!String.IsNullOrEmpty(Proxy_UserName))
                         {
                             Request.Proxy.Credentials = new NetworkCredential(Proxy_UserName, Proxy_PassWord);
@@ -474,7 +503,7 @@ namespace HttpToolsLib
                         Console.WriteLine("设置代理ip失败:{0}", ex.Message);
                     }
                 }
-                else
+                else if (!UseSystemProxy)
                 {
                     Request.Proxy = null;
                 }
@@ -488,27 +517,30 @@ namespace HttpToolsLib
                     Request.ContentLength = ContentLength;
                     using (Stream myRequestStream = Request.GetRequestStream())
                     {
-                        StreamWriter myStreamWriter = new StreamWriter(myRequestStream);
-                        try
+                        using (StreamWriter myStreamWriter = new StreamWriter(myRequestStream))
                         {
                             myStreamWriter.Write(PostData);
-                        }
-                        catch { }
-                        finally
-                        {
-                            myStreamWriter.Close();
-                            myStreamWriter.Dispose();
                         }
                     }
                 }
                 #endregion
 
+                webRequest = null;
                 return Request;
             }
             else
             {
                 return null;
             }
+        }
+        #endregion
+
+
+        #region 辅助函数
+        private static bool RemoteCertificateValidate(object sender, X509Certificate cert, X509Chain chain, SslPolicyErrors error)
+        {
+            //为了通过证书验证，总是返回true
+            return true;
         }
         #endregion
     }

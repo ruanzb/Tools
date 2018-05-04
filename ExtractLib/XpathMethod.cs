@@ -261,7 +261,7 @@ namespace ExtractLib
                 {
                     return node.Attributes[Attributes].Value;
                 }
-                return node.Attributes[Attributes].Value;
+                return node.Attributes[Attributes] == null ? String.Empty: node.Attributes[Attributes].Value;
             }
         }
         /// <summary>

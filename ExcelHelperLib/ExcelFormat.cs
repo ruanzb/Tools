@@ -128,7 +128,7 @@ namespace ExcelHelperLib
         /// <param name="Style">标题单元格样式</param>
         /// <param name="TitleType">标题类型 1列标题 2行标题</param>
         /// <param name="FillModel">(0,0)单元格填充模式</param>
-        public void InsertTitle(IList<object> Inner_objlist, CellStyle Style, TitleType TitleType = TitleType.列标题, FillModel FillModel = FillModel.空出第一个单元格)
+        public void InsertTitle(IList<object> Inner_objlist, CellStyle Style = null, TitleType TitleType = TitleType.列标题, FillModel FillModel = FillModel.空出第一个单元格)
         {
             if (FillModel == FillModel.没有标题)
             {
@@ -136,9 +136,11 @@ namespace ExcelHelperLib
             }
             for (int i = 0; i < Inner_objlist.Count; i++)
             {
-                SCell scell = new SCell();
-                scell.CStyle = Style;
-                scell.Txt_Obj = Inner_objlist[i];
+                SCell scell = new SCell
+                {
+                    CStyle = Style ?? new CellStyle(),
+                    Txt_Obj = Inner_objlist[i]
+                };
                 if (TitleType == ExcelFormat.TitleType.列标题)
                 {
                     if (FillModel == FillModel.列标题填充)
@@ -171,12 +173,12 @@ namespace ExcelHelperLib
         /// </summary>
         /// <param name="row">待插入的数据行</param>
         /// <param name="CStyle">数据行统一单元格样式</param>
-        public void InsertCellRow(CellRow row, CellStyle CStyle)
+        public void InsertCellRow(CellRow row, CellStyle CStyle = null)
         {
             for (int i = row.LeftIndex; i <= row.RightIndex; i++)
             {
                 SCell scell = new SCell();
-                scell.CStyle = CStyle;
+                scell.CStyle = CStyle ?? new CellStyle() ;
                 scell.Y = i;
                 scell.X = row.RowIndex;
                 if (row.Is_Pic)
@@ -195,7 +197,7 @@ namespace ExcelHelperLib
         /// </summary>
         /// <param name="rowlist">待插入数据行列表</param>
         /// <param name="CStyle">数据块统一单元格样式</param>
-        public void InsetCellBlock(List<CellRow> rowlist, CellStyle CStyle)
+        public void InsetCellBlock(List<CellRow> rowlist, CellStyle CStyle = null)
         {
             rowlist.ForEach((item) =>
             {
@@ -208,12 +210,12 @@ namespace ExcelHelperLib
         /// </summary>
         /// <param name="rowlist">待插入数据列列表</param>
         /// <param name="CStyle">数据列统一单元格样式</param>
-        public void InsertCellColm(CellColm clom, CellStyle CStyle)
+        public void InsertCellColm(CellColm clom, CellStyle CStyle = null)
         {
             for (int i = clom.TopIndex; i <= clom.ButtomIndex; i++)
             {
                 SCell scell = new SCell();
-                scell.CStyle = CStyle;
+                scell.CStyle = CStyle ?? new CellStyle();
                 scell.Y = clom.ColmIndex;
                 scell.X = i;
                 if (clom.Is_Pic)
@@ -233,7 +235,7 @@ namespace ExcelHelperLib
         /// </summary>
         /// <param name="rowlist">待插入数据列列表</param>
         /// <param name="CStyle">数据块统一单元格样式</param>
-        public void InsetCellBlock(List<CellColm> rowlist, CellStyle CStyle)
+        public void InsetCellBlock(List<CellColm> rowlist, CellStyle CStyle = null)
         {
             rowlist.ForEach((item) =>
             {

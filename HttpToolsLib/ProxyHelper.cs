@@ -54,36 +54,53 @@ namespace HttpToolsLib
         /// </summary>
         /// <param name="index">代理ip地址在APIList中的索引</param>
         /// <param name="checknum">验ip线程数</param>
-        public static void IPCheckFunc(int index = 1, int checknum = 100)
+        public static void IPCheckFunc(String api = "",int index = 1, int checknum = 100,int limit = 1000,int delay = 5000)
         {
-            String API_Url = API_Url_List[index];
+            String API_Url = String.IsNullOrEmpty(api)?String.Format(API_Url_List[index], limit):api;
             var ips = HttpMethod.InputApi(API_Url);
-            Task[] tarr = new Task[checknum];
+            Thread[] tarr = new Thread[checknum];
             Task.Factory.StartNew(() =>
             {
-                while (IPCheckStack.Count < 1000)
+                while (IPCheckStack.Count < 500)
                 {
                     if (ips.Count == 0)
                     {
                         ips = HttpMethod.InputApi(API_Url);
                     }
-                    Thread.Sleep(5000);
+                    Thread.Sleep(delay);
                 }
             });
+
+
             for (int i = 0; i < checknum; i++)
             {
-                tarr[i] = Task.Factory.StartNew(() =>
-                {
+                tarr[i] = new Thread(new ThreadStart(delegate {
+                    String ip = String.Empty;
+                    HttpHelper helper = new HttpHelper();
+                    HttpItem item = new HttpItem();
+                    HttpResult result = new HttpResult();
+                    item.URL = "http://2017.ip138.com/ic.asp";
+                    item.Timeout = 6000;
+                    item.ReadWriteTimeout = 8000;
+                    item.UserAgent = "Mozilla/5.0 (Windows NT 6.3; rv:36.0) Gecko/20100101 Firefox/36.04";
+                    String Ips = String.Empty;
                     while (true)
                     {
-                        if (IPCheckStack.Count < 200)
+                        if (IPCheckStack.Count < 500)
                         {
-                            String ip = String.Empty;
                             if (ips.TryPop(out ip))
                             {
-                                if (HttpMethod.CheckIp(ip))
+                                item.ProxyIp = ip;
+                                try
                                 {
-                                    IPCheckStack.Push(ip);
+                                    if (helper.GetHtml(item).Html.Contains(ip.Substring(0, ip.IndexOf(":"))))
+                                    {
+                                        IPCheckStack.Push(ip);
+                                    }
+                                }
+                                catch
+                                {
+
                                 }
                             }
                             else
@@ -96,7 +113,9 @@ namespace HttpToolsLib
                             Thread.Sleep(5000);
                         }
                     }
-                });
+                }));
+                tarr[i].IsBackground = true;
+                tarr[i].Start();
             }
         }
         /// <summary>
@@ -104,30 +123,33 @@ namespace HttpToolsLib
         /// </summary>
         /// <param name="index">代理ip地址在APIList中的索引<</param>
         /// <param name="DelayTime">获取间隔</param>
-        public static void IPFunc(int index = 1, int DelayTime = 5000)
+        public static void IPFunc(String api = null, int index = 1, int DelayTime = 5000)
         {
-            String API_Url = API_Url_List[index];
-            while (true)
-            {
-                if (String.IsNullOrEmpty(API_Url))
+            Task.Factory.StartNew(()=> {
+                String API_Url = api ?? API_Url_List[index];
+                while (true)
                 {
-                    return;
-                }
-                String ip = String.Empty;
-                if (IPS.Count == 0)
-                {
-                    var ips = HttpMethod.InputApi(API_Url);
-                    if (ips == null || ips.Count <= 0)
+                    if (String.IsNullOrEmpty(API_Url))
                     {
-                        continue;
+                        return;
                     }
-                    foreach (var item in ips)
+                    String ip = String.Empty;
+                    if (IPS.Count == 0)
                     {
-                        IPS.Push(item);
+                        var ips = HttpMethod.InputApi(API_Url);
+                        if (ips == null || ips.Count <= 0)
+                        {
+                            continue;
+                        }
+                        foreach (var item in ips)
+                        {
+                            IPS.Push(item);
+                        }
                     }
+                    Thread.Sleep(DelayTime);
                 }
-                Thread.Sleep(DelayTime);
-            }
+            });
+
         }
         #endregion
 
@@ -141,20 +163,24 @@ namespace HttpToolsLib
             String ip = String.Empty;
             if (IPCheckStack.TryPop(out ip))
             {
-                // Console.WriteLine(ip);
                 return ip;
             }
-            while (IPS.Count == 0)
+            while (!IPS.TryPop(out ip))
             {
-                Thread.Sleep(1000);
+                Thread.Sleep(1);
             }
-            if (IPS.TryPop(out ip))
-            {
-
-            }
-            //     Console.WriteLine(ip);
             return ip;
-            //return null;
+        }
+
+        public static String PopIp_Checked()
+        {
+            String ip = String.Empty;
+            while (!IPCheckStack.TryPop(out ip))
+            {
+                Thread.Sleep(1);
+                // Console.WriteLine(ip);
+            }
+            return ip;
         }
         /// <summary>
         ///  有效Ip入栈

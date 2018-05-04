@@ -17,6 +17,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 #endregion
 
 namespace HttpToolsLib
@@ -206,6 +207,10 @@ namespace HttpToolsLib
 
     public class RASDisplay
     {
+        public static string ADSLName { get;  set; }
+        public static string ADSLUserName { get;  set; }
+        public static string ADSLPassWord { get;  set; }
+
         /// <summary>
         /// 创建或更新一个PPPOE连接(指定PPPOE名称)
         /// </summary>
@@ -227,12 +232,6 @@ namespace HttpToolsLib
             {
                 string adds = string.Empty;
                 ReadOnlyCollection<RasDevice> readOnlyCollection = RasDevice.GetDevices();
-                //                foreach (var col in readOnlyCollection)
-                //                {
-                //                    adds += col.Name + ":" + col.DeviceType.ToString() + "|||";
-                //                }
-                //                _log.Info("Devices are : " + adds);
-                // Find the device that will be used to dial the connection.
                 RasDevice device = RasDevice.GetDevices().Where(o => o.DeviceType == RasDeviceType.PPPoE).First();
                 RasEntry entry = RasEntry.CreateBroadbandEntry(updatePPPOEname, device);    //建立宽带连接Entry
                 entry.PhoneNumber = " ";
@@ -259,7 +258,7 @@ namespace HttpToolsLib
         /// <param name="username">宽带账号</param>
         /// <param name="password">宽带密码</param>
         /// <returns></returns>
-        public static bool Connect(string PPPOEname, string username, string password, ref string msg)
+        public static bool Connect(string PPPOEname, string username, string password, ref string msg,int delay = 10000)
         {
             try
             {
@@ -278,6 +277,36 @@ namespace HttpToolsLib
             catch (RasException re)
             {
                 msg = re.ErrorCode + " " + re.Message;
+                return false;
+            }
+            finally
+            {
+                Thread.Sleep(delay);
+            }
+        }
+        /// <summary>
+        /// 连接
+        /// </summary>
+        /// <returns></returns>
+        public static bool Connect()
+        {
+            try
+            {
+                CreateOrUpdatePPPOE(ADSLName);
+                using (RasDialer dialer = new RasDialer())
+                {
+                    dialer.EntryName = ADSLName;
+                    dialer.AllowUseStoredCredentials = true;
+                    dialer.Timeout = 1000;
+                    dialer.PhoneBookPath = RasPhoneBook.GetPhoneBookPath(RasPhoneBookType.AllUsers);
+                    dialer.Credentials = new NetworkCredential(ADSLUserName, ADSLPassWord);
+                    dialer.Dial();
+                    return true;
+                }
+            }
+            catch (RasException re)
+            {
+                Console.WriteLine(re.Message);
                 return false;
             }
         }
