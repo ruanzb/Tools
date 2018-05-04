@@ -25,3 +25,8 @@ HttpToolsLib：
 2.允许使用需要身份验证(用户名密码)的Http代理
 3.支持在错误http状态码下尝试获取cookie和响应内容
 4.使用DotRas代替原来的批处理ADSL拨号
+
+-----------------------------------------------
+2018/05/04
+HttpToolsLib：
+修复CookieString使用过程中部分cookie丢失的bug
